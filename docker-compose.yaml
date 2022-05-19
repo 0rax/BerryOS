@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  builder:
+    image: berryos-bootstraper
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/opt/bootstrap
+    working_dir: /opt/bootstrap
+    privileged: true
+    cap_add:
+      - CAP_MKNOD
