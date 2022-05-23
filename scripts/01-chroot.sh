@@ -127,12 +127,6 @@ apt-get install -y \
     cloud-init \
     ssh-import-id
 
-# Link cloud-init configuration from boot partition
-mkdir -p /var/lib/cloud/seed/nocloud-net
-ln -s /boot/user-data /var/lib/cloud/seed/nocloud-net/user-data
-ln -s /boot/meta-data /var/lib/cloud/seed/nocloud-net/meta-data
-ln -s /boot/network-config /var/lib/cloud/seed/nocloud-net/network-config
-
 # Disable dhcpcd & systemd-resolved (conflicts with cloud-init network config)
 systemctl mask dhcpcd
 systemctl mask systemd-resolved

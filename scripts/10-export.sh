@@ -66,7 +66,7 @@ mount_image () {
 
     # Create file systems
     mkfs.vfat "${BOOT_DEV}" -n "boot"
-    mkfs.ext4 "${ROOT_DEV}" -L "rootfs" -i 4096 # create 1 inode per 4kByte block (maximum ratio is 1 per 1kByte)
+    mkfs.ext4 "${ROOT_DEV}" -L "rootfs" -F -i 4096 # create 1 inode per 4kByte block (maximum ratio is 1 per 1kByte)
 
     # Mount file systems
     mount -v "${ROOT_DEV}" "/mnt" -t ext4

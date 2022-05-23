@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 services:
   builder:
@@ -9,5 +9,4 @@ services:
     volumes:
       - .:/opt/bootstrap
     working_dir: /opt/bootstrap
-    cap_add:
-      - 'ALL'
+    privileged: true
