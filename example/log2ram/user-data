@@ -1,0 +1,104 @@
+#cloud-config
+# vim: syntax=yaml
+#
+
+## Setup hostname
+hostname: berryos-log2ram
+manage_etc_hosts: true
+
+## Create users (respect OS default)
+users:
+  - default
+
+## Setup extra APT source.list
+apt:
+  preserve_sources_list: true
+  sources:
+    azlux.list:
+      source: "deb https://packages.azlux.fr/debian/ bullseye main"
+      key: |
+        -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+        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
+        =sXvI
+        -----END PGP PUBLIC KEY BLOCK-----
+
+## Update system and install required packages
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+packages:
+  - log2ram
+
+## Create config files
+write_files:
+  - path: /etc/systemd/journald.conf
+    permission: "0644"
+    owner: root:root
+    content: |
+      [Journal]
+      SystemMaxUse=16M
+  - path: /etc/log2ram.conf
+    permissions: "0544"
+    owner: "root:root"
+    content: |
+      ## Configuration file for Log2Ram (https://github.com/azlux/log2ram) under MIT license.
+      SIZE=64M
+      MAIL=false
+      PATH_DISK="/var/log"
+      ZL2R=false
+      COMP_ALG=lz4
+      LOG_DISK_SIZE=150M
+
+runcmd:
+  - systemctl enable log2ram
+
+## Reboot after provisioning
+power_state:
+  mode: reboot

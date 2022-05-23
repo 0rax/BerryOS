@@ -9,6 +9,5 @@ services:
     volumes:
       - .:/opt/bootstrap
     working_dir: /opt/bootstrap
-    privileged: true
     cap_add:
-      - CAP_MKNOD
+      - 'ALL'
