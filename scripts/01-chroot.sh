@@ -164,6 +164,9 @@ systemctl daemon-reload
 systemctl enable fake-hwclock
 fake-hwclock save
 
+## Set default systemd target
+systemctl set-default multi-user.target
+
 ## Cleanup
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apt/archives/*
