@@ -46,6 +46,12 @@ case "${DEBIAN_VARIANT}" in
     ;;
 esac
 
+# Set default systemd target to multi-user
+systemctl set-default multi-user.target
+
+# Enable network time synchronisation using systemd-timesyncd
+systemctl enable systemd-timesyncd
+
 ## Install Raspberry Pi dependencies
 
 # Add Raspberry Pi official repository
@@ -89,9 +95,6 @@ apt-get install -y \
     libraspberrypi0 \
     libraspberrypi-bin \
     raspi-config
-
-# Enable serial console
-printf "# Spawn a getty on Raspberry Pi serial line\nT0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100\n" >> /etc/inittab
 
 ## Setup OS specifics
 
@@ -163,9 +166,6 @@ systemctl daemon-reload
 # Enable fake-hwclock and store current time
 systemctl enable fake-hwclock
 fake-hwclock save
-
-## Set default systemd target
-systemctl set-default multi-user.target
 
 ## Cleanup
 apt-get clean

@@ -6,13 +6,18 @@ Just the berry part of Raspberry Pi OS with a sprinkle of cloud sugar.
 
 BerryOS is a lightweight distribution of Raspberry Pi OS, meant to be used as a clean base when configuring a new Raspberry Pi. It focuses mainly on providing a lighter operation than can be configured headlessly at first boot.
 
-This image includes as little as possible with the addition of:
+This image includes as little pre-installed packages as possible with the following changes from the mainline images:
 
-- `cloud-init` to handle headless configuration at first boot
-- `rng-tools5` to enable random number generation offloading to the hardware
+- Addition of `cloud-init` to handle headless configuration at first boot
 - `openssh` enabled by default
-- `systemd-timesyncd` enabled by default to handle network time synchronization
-- Disable predictable network interface name by default (to ease network configuration)
+- Serial console disabled by default (can be re-enabled easily)
+- Bluetooth support not configured by default
+
+Other services from Raspberry Pi OS have been kept such as:
+
+- `fake-hwclock` to emulate a hardware clock by committing current to disk periodically
+- `rngd` (from `rng-tools5`) to enable random number generation offloading to the hardware
+- `systemd-timesyncd` to handle network time synchronization (configurable via `cloud-init`)
 
 ## Why ?
 
@@ -25,14 +30,6 @@ Other base image exists, but I wanted to stay with something loosely Debian rela
 This is why I decided to create BerryOS, a slim down version of the Raspberry Pi OS that includes `cloud-init`.
 
 ## Details
-
-Extra enabled services:
-
-- `cloud-init` (run at boot)
-- `systemd-timesyncd` (when enabled via `cloud-init`, enabled by default)
-- `fake-hwclock` (run at boot, shutdown and every hour)
-- `rngd`
-- `openssh`
 
 Default user (when `default` is specified in `cloud-init` users or if no users are configured in `/boot/user-data`):
 
@@ -74,9 +71,9 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 | Stat                   | BerryOS Bullseye | RaspiOS Lite Bullseye (2022-04-04) |
 | ---------------------- | ---------------- | ---------------------------------- |
 | RAM usage              | 39M              | 57M                                |
-| Running processes      | 12               | 20                                 |
-| Disk usage             | 791.5M           | 1.3G                               |
-| Pre-installed packages | 312              | 530                                |
+| Running processes      | 14               | 18                                 |
+| Disk usage             | 786.5M           | 1.3G                               |
+| Pre-installed packages | 307              | 530                                |
 | Download size          | 196M             | 297M                               |
 | Image size             | 1308M            | 1924M                              |
 
@@ -85,7 +82,7 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 | Stat                   | BerryOS Bullseye | RaspiOS Lite Bullseye (2022-04-04) |
 | ---------------------- | ---------------- | ---------------------------------- |
 | RAM usage              | 53M              | 72M                                |
-| Running processes      | 13               | 20                                 |
+| Running processes      | 14               | 20                                 |
 | Disk usage             | 606.1M           | 1.3G                               |
 | Pre-installed packages | 280              | 521                                |
 | Download size          | 151M             | 271M                               |
