@@ -152,7 +152,7 @@ configure_rootfs () {
 }
 
 package_rootfs () {
-    # Package rootfs in tar
+    # Package and compress rootfs
     mkdir -p "${OUTPUT_DIR}"
     tar -c -I 'xz -9 -T0' --file="${ROOTFS_TAR}" --directory="${ROOTFS_DIR}" .
 }

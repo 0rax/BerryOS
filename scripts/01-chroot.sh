@@ -6,15 +6,19 @@ if ! [ "$(stat -c %d:%i /)" != "$(stat -c %d:%i /proc/1/root/.)" ]; then
   exit 1
 fi
 
+## Build config
 OS_NAME="${OS_NAME?}"
 OS_VERSION="${OS_VERSION?}"
 OS_PREFIX="${OS_PREFIX:-${OS_NAME^^}}"
+BUILD_ARCH="${BUILD_ARCH:-$(dpkg --print-architecture)}"
+
+## Debian base
 DEBIAN_VARIANT="${DEBIAN_VARIANT?}"
 DEBIAN_RELEASE="${DEBIAN_RELEASE?}"
 DEBIAN_VERSION="${DEBIAN_VERSION?}"
 DEBOOTSTRAP_URL="${DEBOOTSTRAP_URL?}"
 
-BUILD_ARCH="${BUILD_ARCH:-$(dpkg --print-architecture)}"
+## System config
 DEFAULT_HOSTNAME="${DEFAULT_HOSTNAME:-"berry"}"
 
 ## Configure Base system
@@ -48,9 +52,6 @@ esac
 
 # Set default systemd target to multi-user
 systemctl set-default multi-user.target
-
-# Enable network time synchronisation using systemd-timesyncd
-systemctl enable systemd-timesyncd
 
 ## Install Raspberry Pi dependencies
 
@@ -130,15 +131,15 @@ apt-get install -y \
     cloud-init \
     ssh-import-id
 
-# Disable dhcpcd & systemd-resolved (conflicts with cloud-init network config)
+# Mask dhcpcd & systemd-resolved to prevent potential conflicts with with cloud-init network config)
 systemctl mask dhcpcd
 systemctl mask systemd-resolved
 
 # Enable remote access via ssh
 systemctl enable ssh
 
-# Disable systemd-timesyncd as it is handled & configured by cloud-init
-systemctl disable systemd-timesyncd
+# Enable network time synchronization using systemd-timesyncd
+systemctl enable systemd-timesyncd
 
 ## Configure Hardware RNG support
 

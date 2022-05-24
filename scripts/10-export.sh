@@ -26,11 +26,13 @@ setup_rootfs () {
 }
 
 create_image () {
+    # Calculate part size
     MIB="$((1024 * 1024))"
     BOOTFS_SIZE="$((256 * MIB))"
     ROOTFS_SIZE="$(du --apparent-size -s "${ROOTFS_DIR}" --exclude var/cache/apt/archives --exclude boot --block-size=1 | cut -f 1)"
     ROOTFS_MARGIN="$(echo "(${ROOTFS_SIZE} * 0.2 + 200 * 1024 * 1024) / 1" | bc)"
 
+    # Compute part offset and alignment
     ALIGN="$((4 * MIB))"
     BOOT_PART_START="$((ALIGN))"
     BOOT_PART_SIZE="$(((BOOTFS_SIZE + ALIGN - 1) / ALIGN * ALIGN))"
@@ -38,12 +40,13 @@ create_image () {
     ROOT_PART_SIZE="$(((ROOTFS_SIZE + ROOTFS_MARGIN + ALIGN  - 1) / ALIGN * ALIGN))"
     IMG_SIZE="$((BOOT_PART_START + BOOT_PART_SIZE + ROOT_PART_SIZE))"
 
+    # Generate and partition disk image
     truncate -s "${IMG_SIZE}" "${IMAGE_PATH}"
     parted --script "${IMAGE_PATH}" mklabel msdos
     parted --script "${IMAGE_PATH}" unit B mkpart primary fat32 "${BOOT_PART_START}" "$((BOOT_PART_START + BOOT_PART_SIZE - 1))"
     parted --script "${IMAGE_PATH}" unit B mkpart primary ext4 "${ROOT_PART_START}" "$((ROOT_PART_START + ROOT_PART_SIZE - 1))"
 
-    # Export PARTUUD prefix
+    # Export PARTUUIDs
     IMAGE_PARTUUID_PREFIX="$(dd if="${IMAGE_PATH}" skip=440 bs=1 count=4 2>/dev/null | xxd -e | cut -f 2 -d' ')"
     BOOT_PARTUUID="${IMAGE_PARTUUID_PREFIX}-01"
     ROOT_PARTUUID="${IMAGE_PARTUUID_PREFIX}-02"
@@ -75,16 +78,24 @@ mount_image () {
 }
 
 patch_rootfs () {
+    # Create mount points
     mkdir -p "${ROOTFS_DIR}"/{proc,sys,dev/pts}
+
+    # Inject PARTUUID in /etc/fstab & /boot/cmdline.txt
     sed -i "s/BOOTDEV/PARTUUID=${BOOT_PARTUUID}/" "${ROOTFS_DIR}/etc/fstab"
     sed -i "s/ROOTDEV/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/etc/fstab"
     sed -i "s/ROOTDEV/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/boot/cmdline.txt"
+
+    # Reset machine-id
     rm -f "${ROOTFS_DIR}/var/lib/dbus/machine-id"
     true > "${ROOTFS_DIR}/etc/machine-id"
+
+    # Cleanup logs
     find "${ROOTFS_DIR}/var/log/" -type f -exec cp /dev/null {} \;
 }
 
 sync_rootfs () {
+    # Copy rootfs content to mounted file systems
     rsync -aHAXx --exclude /var/cache/apt/archives --exclude /boot "${ROOTFS_DIR}/" "/mnt"
     rsync -rtx "${ROOTFS_DIR}/boot/" "/mnt/boot/"
 }
@@ -103,10 +114,12 @@ umount_image () {
 }
 
 cleanup_rootfs () {
+    # Cleanup
     rm -rf "${ROOTFS_DIR}"
 }
 
 compress_image () {
+    # Compress disk image
     xz -T0 -c9 "${IMAGE_PATH}" > "${IMAGE_PATH}.xz"
 }
 
