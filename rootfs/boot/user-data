@@ -1,73 +1,91 @@
 #cloud-config
 # vim: syntax=yaml
 #
+# BerryOS Default Cloud Config
+#
 
-# Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
-hostname: berry
-manage_etc_hosts: true
+# ## Set system hostname
+# hostname: berry                     # System hostname
+# manage_etc_hosts: true              # If true, will also update the /etc/hosts file entries
+# # Reference(s):
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#set-hostname
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#update-etc-hosts
 
+# ## Configure NTP pools
 # ntp:
-#   enabled: true
-#   ntp_client: systemd-timesyncd
-#   pools:
-#     - 0.debian.pool.ntp.org
-#     - 1.debian.pool.ntp.org
-#     - 2.debian.pool.ntp.org
-#     - 3.debian.pool.ntp.org
+#   enabled: true                     # Enable NTP module
+#   ntp_client: systemd-timesyncd     # Specify NTP client (systemd-timesyncd by default)
+#   pools:                            # Specift custom pool uri
+#     - 0.uk.pool.ntp.org
+#     - 1.uk.pool.ntp.org
+#     - 2.uk.pool.ntp.org
+#     - 3.uk.pool.ntp.org
+# # Reference(s):
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#ntp
 
-# # You could modify this for your own user information
+# ## Configure default user access
+# password: berryos                   # Set default user password
+# ssh_pwauth: true                    # Enable SSH password authentication for default user
+# ssh_authorized_keys:                # Set SSH authorized keys for default user
+#   - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEA3FSyQwBI6Z+nCSjUU ...
+#   - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA3I7VUf2l5gSn5uavROsc5HRDpZ ...
+# ssh_import_id:                      # Import SSH authorized keys from a remote source for default user
+#   - gh:0rax
+# # Reference(s):
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#set-passwords
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#authorized-keys
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#ssh-import-id
+
+# ## Create your own user (overrides default user configuration)
 # users:
-#   - name: pi
-#     gecos: "Default User"
-#     sudo: ALL=(ALL) NOPASSWD:ALL
-#     shell: /bin/bash
-#     groups: users,video,input
-#     plain_text_passwd: raspberry
-#     lock_passwd: false
-#     ssh_pwauth: true
-#     chpasswd: { expire: false }
+#   - name: myuser                    # Create new custom user
+#     gecos: "My Custom User"         # Set user description
+#     sudo: ALL=(ALL) NOPASSWD:ALL    # Enable passwordless sudo
+#     shell: /bin/bash                # Set user default shell
+#     groups:                         # Set user groups
+#       [adm, dialout, cdrom, sudo, audio, video, plugdev, games, users, input, render, netdev]
+#     plain_text_passwd: berryos      # Set user password
+#     ssh_pwauth: true                # Allow SSH password auth for the user
+#     ssh_authorized_keys:            # Set SSH authorized keys for the user
+#       - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEA3FSyQwBI6Z+nCSjUU ...
+#       - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA3I7VUf2l5gSn5uavROsc5HRDpZ ...
+#     ssh_import_id:                  # Import SSH authorized keys from a remote source for the user
+#       - gh:0rax
+# # Reference(s):
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#users-and-groups
 
-# # Set the locale of the system
-# locale: "en_US.UTF-8"
+# ## Set the system timezone
+# timezone: "Europe/London"           # Timezone value must exist in /usr/share/zoneinfo
+# # Reference(s):
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#timezone
 
-# # Set the timezone
-# # Value of 'timezone' must exist in /usr/share/zoneinfo
-# timezone: "America/Los_Angeles"
+# # Update package list, upgrade system or install new packages on first boot
+# package_update: true                # Update package list
+# package_upgrade: true               # Update system package on first-noot
+# package_reboot_if_required: true    # Reboot system after installing or upgrading if needed
+# packages:                           # Install additional packages
+#   - vim
+# # Reference(s):
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#package-update-upgrade-install
 
-# # Update apt packages on first boot
-# package_update: true
-# package_upgrade: true
-# package_reboot_if_required: true
-package_upgrade: false
-
-# # Install any additional apt packages you need here
-# packages:
-#  - ntp
-
-# # WiFi connect to HotSpot
-# # - use `wpa_passphrase SSID PASSWORD` to encrypt the psk
+# ## Write custom files to disk
 # write_files:
-#   - content: |
-#       allow-hotplug wlan0
-#       iface wlan0 inet dhcp
-#       wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
-#       iface default inet dhcp
-#     path: /etc/network/interfaces.d/wlan0
-#   - content: |
-#       country=de
-#       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-#       update_config=1
-#       network={
-#       ssid="YOUR_WIFI_SSID"
-#       psk="YOUR_WIFI_PASSWORD"
-#       proto=RSN
-#       key_mgmt=WPA-PSK
-#       pairwise=CCMP
-#       auth_alg=OPEN
-#       }
-#     path: /etc/wpa_supplicant/wpa_supplicant.conf
+#   - path: /opt/berryos/hello-world  # File path
+#     permissions: "0644"             # File permission
+#     owner: "root:root"              # File ownership
+#     content: |                      # File content
+#       Hello BerrOS !
+# # Reference(s):
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#write-files
 
-# These commands will be ran once on first boot only
+# ## Run commands on first boot (runs after all module)
 # runcmd:
-#  # Activate WiFi interface
-#  - 'ifup wlan0'
+#   - echo BerryOS
+# # Reference(s):
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#runcmd
+
+# ## Reboot system after provisioning
+# power_state:
+#   mode: reboot
+# # Reference(s):
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#power-state-change

@@ -1,47 +1,16 @@
 # BerryOS
 
-## What ?
+## What is BerryOS ?
 
-BerryOS is a lightweight distribution of Raspberry Pi OS, meant to be used as a clean base when configuring a new Raspberry Pi. It focuses mainly on providing a lighter operating system than can be configured headlessly at first boot.
+BerryOS is a lightweight distribution of Raspberry Pi OS, meant to be used as a clean base when configuring a new Raspberry Pi. It focuses on providing a lighter operating system than can be configured headlessly at first boot.
 
-This image includes as little pre-installed packages as possible with the following changes from the mainline images:
+It was born out of the frustration of not being able to configure Raspberry Pi OS Lite using [`cloud-init`](https://cloudinit.readthedocs.io/en/latest/index.html) easily and the fact that alternatives such as Ubuntu includes way too many pieces of software by default (such as `snapd` or `unattended-upgrades` which can chew RAM and CPU cycles).
 
-- Addition of `cloud-init` to handle unattended provisioning at first boot
-- `openssh` enabled by default
-- Serial console disabled by default
-- Bluetooth support not configured by default
-- No swapfile configured by default
+## Overview
 
-Other services from Raspberry Pi OS have been kept such as:
+### Compatibility
 
-- `fake-hwclock` to emulate a hardware clock by committing current date to disk periodically
-- `rngd` to enable random number generation offloading to the hardware (provided by `rng-tools5`)
-- `systemd-timesyncd` to handle network time synchronization (configurable via `cloud-init`)
-
-In the end, BerryOS is just a stripped down version of [Raspberry Pi OS Lite (Stage 2)](https://github.com/RPi-Distro/pi-gen/blob/master/README.md#stage-anatomy) with `cloud-init`. The perfect base image to self-host any application on your Raspberry Pi !
-
-## Why ?
-
-Raspberry Pis are great little computers, though setting one up can take some time especially when you want to optimize CPU and RAM consumption as much as possible. I've found myself writing quite a lot of small scripts to set up a new Pi with some specific scenarios when testing some software just to have a simple base for myself.
-
-One solution I found out was to use the Ubuntu Server image for Raspberry Pi, this image includes `cloud-init`, a nifty tool usually used to configure virtual machines, which allows you to configure your system at first boot (which user you want to create, their SSH keys, a set of scripts to run at first boot or on every startup, ...). This was a great solution, though after some time, I have discovered that there is a lot of things running by default on this image that I do not like such as `unattended-upgrades` which can cripple your Raspberry Pi's performance when doing updates in the background or `snapd` which I never use.
-
-Other base image exists, but I wanted to stay with something loosely Debian based as most of the official tools provided by the Raspberry Pi foundation are built for it. It is also usually the only system supported by manufacturers for some weirder Pi accessories you can buy online.
-
-This is why I decided to create BerryOS, a slimmed down alternative to Raspberry Pi OS List that includes `cloud-init`.
-
-## How ?
-
-<!-- TODO: GETTING STARTED -->
-
-## Details
-
-Default user (when `default` is specified in `cloud-init` users or if no users are configured in `/boot/user-data`):
-
-- Username: `pi`
-- Password: `raspberry`
-
-Compatibility:
+BerryOS is available in two variant, a 32-bit version called `BerryOS/armhf` and a 64-bit version called `BerryOS/arm64`. Each image should have the same compatibility as their Raspberry Pi OS counterpart meaning:
 
 - `BerryOS/armhf` should be compatible with ALL Raspberry Pi models
 - `BerryOS/arm64` should be compatible with:
@@ -54,11 +23,52 @@ Compatibility:
   - Raspberry Compute Module 4
   - Raspberry Pi Zero 2 W
 
-Tested on:
+Each release is tested on the following hardware:
 
 - Raspberry Pi 2 B (`armhf`)
 - Raspberry Pi 3 B (`armhf` & `arm64`)
 - Raspberry Pi 3 B+ (`armhf` & `arm64`)
+
+Due to its nature, it should also provide the same level of compatibility with 3rd party software and hardware as Raspberry Pi OS.
+
+### Differences and similarities to Raspberry Pi OS Lite
+
+The goal of the images provided by BerryOS is to provide a similar user experience to Raspberry Pi OS Lite while including as little pre-installed packages as possible and making unattended provisioning possible.
+
+To do so, BerryOS is bootstrapped from the same base as Raspberry Pi OS Lite with a reduced list of package installed by default and the following changes to the default configuration:
+
+- Addition of `cloud-init` to handle unattended provisioning at first boot
+- `openssh` enabled by default
+- Serial console disabled by default
+- Bluetooth support not configured by default
+- No swapfile configured by default
+- `wpa_supplicant` installed and configured by disabled by default
+
+On the other hand, some services have been kept as is from Raspberry Pi such as:
+
+- `fake-hwclock` to emulate a hardware clock by committing current date to disk periodically
+- `rngd` to enable random number generation offloading to the hardware (provided by `rng-tools5`)
+- `systemd-timesyncd` to handle network time synchronization (configurable via `cloud-init`)
+
+In the end, BerryOS is just a stripped down version of [Raspberry Pi OS Lite (Stage 2)](https://github.com/RPi-Distro/pi-gen/blob/master/README.md#stage-anatomy) with the addition of `cloud-init`, making it the perfect base to self-host any application your Raspberry Pi.
+
+### Default environment
+
+If not configured using `/boot/user-data`, BerryOS will be provisioned using its default configuration, this default environment will include the default user accessible via:
+
+- Username: `pi`
+- Password: `raspberry`
+
+To follow [the decision made by the Raspberry Pi OS team in April 2022](https://www.raspberrypi.com/news/raspberry-pi-bullseye-update-april-2022/), access to this default user via SSH will be DISABLED by default. In order to access your system headlessly and configure SSH access, follow the ["Getting started" guide](#getting-started) down below.
+
+This default environment will also try to:
+
+- Enable and configure `eth0` using DHCP
+- Synchronize time with the default NTP pool (`debian.pool.ntp.org`)
+
+## Getting Started
+
+<!-- TODO: GETTING STARTED -->
 
 ## Benchmark
 
@@ -75,10 +85,10 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 | Stat                   | BerryOS Bullseye | RaspiOS Lite Bullseye (2022-04-04) |
 | ---------------------- | ---------------- | ---------------------------------- |
-| RAM usage              | 39M              | 57M                                |
-| Running processes      | 13               | 18                                 |
+| RAM usage              | 38M              | 57M                                |
+| Running processes      | 12               | 18                                 |
 | Disk usage             | 786.5M           | 1.3G                               |
-| Pre-installed packages | 307              | 530                                |
+| Pre-installed packages | 308              | 530                                |
 | Download size          | 200M             | 297M                               |
 | Image size             | 1308M            | 1924M                              |
 
@@ -86,12 +96,23 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 | Stat                   | BerryOS Bullseye | RaspiOS Lite Bullseye (2022-04-04) |
 | ---------------------- | ---------------- | ---------------------------------- |
-| RAM usage              | 53M              | 72M                                |
-| Running processes      | 13               | 20                                 |
+| RAM usage              | 52M              | 72M                                |
+| Running processes      | 12               | 20                                 |
 | Disk usage             | 614.6M           | 1.3G                               |
-| Pre-installed packages | 280              | 521                                |
+| Pre-installed packages | 281              | 521                                |
 | Download size          | 152M             | 271M                               |
 | Image size             | 1108M            | 1908M                              |
+
+## Known issues
+
+- Setting system locale using the [Locale `cloud-init` module](https://cloudinit.readthedocs.io/en/latest/topics/modules.html#locale) currently DOES NOT WORK
+  - Trying to update locale using it will result in a `Error: invalid locale settings`
+  - The issue has been reported upstream under [Debian Bug Report #970796](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=955733)
+  - System locale should be updated manually as part of the `runcmd` section using `localectl set-locale $LOCALE_NAME` in the meantime using:
+    ```yaml
+    runcmd:
+      - localectl set-local en_US.UTF-8
+    ```
 
 ## Acknowledgements
 

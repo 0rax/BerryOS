@@ -141,6 +141,9 @@ systemctl enable ssh
 # Enable network time synchronization using systemd-timesyncd
 systemctl enable systemd-timesyncd
 
+# Do not start wpa_supplicant when not needed
+systemctl disable wpa_supplicant
+
 ## Configure Hardware RNG support
 
 # Install rng-tools

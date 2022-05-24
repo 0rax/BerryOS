@@ -85,7 +85,7 @@ write_files:
       [Journal]
       SystemMaxUse=16M
   - path: /etc/log2ram.conf
-    permissions: "0544"
+    permissions: "0644"
     owner: "root:root"
     content: |
       ## Configuration file for Log2Ram (https://github.com/azlux/log2ram) under MIT license.
