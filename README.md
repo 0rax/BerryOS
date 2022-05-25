@@ -31,7 +31,7 @@ Each release is tested on the following hardware:
 
 Due to its nature, it should also provide the same level of compatibility with 3rd party software and hardware as Raspberry Pi OS.
 
-### Similarities and differences to Raspberry Pi OS Lite
+### Similarities and differences with Raspberry Pi OS Lite
 
 The goal of the images provided by BerryOS is to provide a similar user experience to Raspberry Pi OS Lite while including as little pre-installed packages as possible and making unattended provisioning possible.
 
@@ -76,11 +76,11 @@ This default environment will also try to:
 - Unmount your SD card, insert it in your Raspberry Pi, plug your Ethernet cable and provide it with power
 - Congratulation, you are now running BerryOS !
 
-More complex configuration scenario are available under the [`examples` folder](https://github.com/0rax/BerryOS/tree/main/examples) or in [this project wiki](https://github.com/0rax/BerryOS/wiki).
+More complex configuration scenario are available under the [`examples` folder](examples/) or in [this project wiki](https://github.com/0rax/BerryOS/wiki).
 
 ## Benchmark
 
-Benchmarked on a Raspberry Pi 3 B connected via Ethernet using DHCP using the following commands after first-boot:
+Benchmarked on a Raspberry Pi 3 B connected via Ethernet using DHCP with the following commands after first-boot:
 
 - RAM usage: `free -th | mawk '/^Total:/{print $3}'`
 - Running processes: `pstree -Ta` (removing `sshd` & `systemctl --user` session)

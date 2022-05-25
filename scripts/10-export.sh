@@ -121,6 +121,9 @@ cleanup_rootfs () {
 compress_image () {
     # Compress disk image
     xz -T0 -c9 "${IMAGE_PATH}" > "${IMAGE_PATH}.xz"
+
+    # Remove uncompressed image to save space
+    rm -f "${IMAGE_PATH}"
 }
 
 setup_rootfs
