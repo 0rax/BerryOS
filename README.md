@@ -8,7 +8,7 @@ It was born out of the frustration of not being able to configure Raspberry Pi O
 
 ## Overview
 
-### Compatibility
+### Compatible hardware
 
 BerryOS is available in two variant, a 32-bit version called `BerryOS/armhf` and a 64-bit version called `BerryOS/arm64`. Each image should have the same compatibility as their Raspberry Pi OS counterpart meaning:
 
@@ -31,7 +31,7 @@ Each release is tested on the following hardware:
 
 Due to its nature, it should also provide the same level of compatibility with 3rd party software and hardware as Raspberry Pi OS.
 
-### Differences and similarities to Raspberry Pi OS Lite
+### Similarities and differences to Raspberry Pi OS Lite
 
 The goal of the images provided by BerryOS is to provide a similar user experience to Raspberry Pi OS Lite while including as little pre-installed packages as possible and making unattended provisioning possible.
 
@@ -68,7 +68,15 @@ This default environment will also try to:
 
 ## Getting Started
 
-<!-- TODO: GETTING STARTED -->
+- Download the latest version of BerryOS for your targeted architecture from the [latest release](https://github.com/0rax/BerryOS/releases/latest) and flash it on your SD card using your tool of choice
+- Unplug and re-plug your SD card from your computer to discover newly created partition
+- Open the `user-data` file from the `boot` partition of your SD card with your favorite editor
+- Uncomment `Configure default user access` section and update it to your need
+- We suggest reading through the whole file to see all the possible configuration available before continuing
+- Unmount your SD card, insert it in your Raspberry Pi, plug your Ethernet cable and provide it with power
+- Congratulation, you are now running BerryOS !
+
+More complex configuration scenario are available under the [`examples` folder](https://github.com/0rax/BerryOS/tree/main/examples) or in [this project wiki](https://github.com/0rax/BerryOS/wiki).
 
 ## Benchmark
 
@@ -87,7 +95,7 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 | ---------------------- | ---------------- | ---------------------------------- |
 | RAM usage              | 38M              | 57M                                |
 | Running processes      | 12               | 18                                 |
-| Disk usage             | 786.5M           | 1.3G                               |
+| Disk usage             | 786.6M           | 1.3G                               |
 | Pre-installed packages | 308              | 530                                |
 | Download size          | 200M             | 297M                               |
 | Image size             | 1308M            | 1924M                              |
@@ -96,9 +104,9 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 | Stat                   | BerryOS Bullseye | RaspiOS Lite Bullseye (2022-04-04) |
 | ---------------------- | ---------------- | ---------------------------------- |
-| RAM usage              | 52M              | 72M                                |
+| RAM usage              | 53M              | 72M                                |
 | Running processes      | 12               | 20                                 |
-| Disk usage             | 614.6M           | 1.3G                               |
+| Disk usage             | 614.8M           | 1.3G                               |
 | Pre-installed packages | 281              | 521                                |
 | Download size          | 152M             | 271M                               |
 | Image size             | 1108M            | 1908M                              |

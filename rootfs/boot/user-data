@@ -25,6 +25,7 @@
 
 # ## Configure default user access
 # password: berryos                   # Set default user password
+# chpasswd: { expire: false }         # Do not expire password after first login
 # ssh_pwauth: true                    # Enable SSH password authentication for default user
 # ssh_authorized_keys:                # Set SSH authorized keys for default user
 #   - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEA3FSyQwBI6Z+nCSjUU ...
@@ -45,6 +46,7 @@
 #     groups:                         # Set user groups
 #       [adm, dialout, cdrom, sudo, audio, video, plugdev, games, users, input, render, netdev]
 #     plain_text_passwd: berryos      # Set user password
+#     chpasswd: { expire: false }     # Do not expire password after first login
 #     ssh_pwauth: true                # Allow SSH password auth for the user
 #     ssh_authorized_keys:            # Set SSH authorized keys for the user
 #       - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEA3FSyQwBI6Z+nCSjUU ...
