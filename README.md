@@ -1,4 +1,4 @@
-# BerryOS
+# ![BerryOS](https://github.com/0rax/BerryOS/wiki/assets/berryos-banner.png)
 
 ## What is BerryOS ?
 
@@ -119,7 +119,7 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
   - System locale should be updated manually as part of the `runcmd` section using `localectl set-locale $LOCALE_NAME` in the meantime using:
     ```yaml
     runcmd:
-      - localectl set-local en_US.UTF-8
+      - localectl set-locale en_US.UTF-8
     ```
 
 ## Acknowledgements
