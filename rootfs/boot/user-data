@@ -14,7 +14,6 @@
 # ## Configure NTP pools
 # ntp:
 #   enabled: true                     # Enable NTP module
-#   ntp_client: systemd-timesyncd     # Specify NTP client (systemd-timesyncd by default)
 #   pools:                            # Specift custom pool uri
 #     - 0.uk.pool.ntp.org
 #     - 1.uk.pool.ntp.org

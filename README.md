@@ -38,6 +38,7 @@ The goal of the images provided by BerryOS is to provide a similar user experien
 To do so, BerryOS is bootstrapped from the same base as Raspberry Pi OS Lite with a reduced list of package installed by default and the following changes to the default configuration:
 
 - Addition of `cloud-init` to handle unattended provisioning at first boot
+- Addition of `netplan` to handle Wi-Fi configuration using `cloud-init`
 - `openssh` enabled by default
 - Serial console disabled by default
 - Bluetooth support not configured by default
@@ -50,7 +51,7 @@ On the other hand, some services have been kept as is from Raspberry Pi such as:
 - `rngd` to enable random number generation offloading to the hardware (provided by `rng-tools5`)
 - `systemd-timesyncd` to handle network time synchronization (configurable via `cloud-init`)
 
-In the end, BerryOS is just a stripped down version of [Raspberry Pi OS Lite (Stage 2)](https://github.com/RPi-Distro/pi-gen/blob/master/README.md#stage-anatomy) with the addition of `cloud-init`, making it the perfect base to self-host any application your Raspberry Pi.
+In the end, BerryOS is just a stripped down version of [Raspberry Pi OS Lite (Stage 2)](https://github.com/RPi-Distro/pi-gen/blob/master/README.md#stage-anatomy) with the addition of `cloud-init` & `netplan`, making it the perfect base to self-host any application your Raspberry Pi.
 
 ### Default environment
 
@@ -91,36 +92,25 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 ### `BerryOS/armhf`
 
-| Stat                   | BerryOS Bullseye | RaspiOS Lite Bullseye (2022-04-04) |
-| ---------------------- | ---------------- | ---------------------------------- |
-| RAM usage              | 38M              | 57M                                |
-| Running processes      | 12               | 18                                 |
-| Disk usage             | 786.6M           | 1.3G                               |
-| Pre-installed packages | 308              | 530                                |
-| Download size          | 200M             | 297M                               |
-| Image size             | 1308M            | 1924M                              |
+| Stat                   | BerryOS Bullseye (2022.05.29) | RaspiOS Lite Bullseye (2022.04.04) |
+| ---------------------- | ----------------------------- | ---------------------------------- |
+| RAM usage              | 37M                           | 57M                                |
+| Running processes      | 12                            | 18                                 |
+| Disk usage             | 807.1M                        | 1.3G                               |
+| Pre-installed packages | 312                           | 530                                |
+| Download size          | 201M                          | 297M                               |
+| Image size             | 1312M                         | 1924M                              |
 
 ### `BerryOS/arm64`
 
-| Stat                   | BerryOS Bullseye | RaspiOS Lite Bullseye (2022-04-04) |
-| ---------------------- | ---------------- | ---------------------------------- |
-| RAM usage              | 53M              | 72M                                |
-| Running processes      | 12               | 20                                 |
-| Disk usage             | 614.8M           | 1.3G                               |
-| Pre-installed packages | 281              | 521                                |
-| Download size          | 152M             | 271M                               |
-| Image size             | 1108M            | 1908M                              |
-
-## Known issues
-
-- Setting system locale using the [Locale `cloud-init` module](https://cloudinit.readthedocs.io/en/latest/topics/modules.html#locale) currently DOES NOT WORK
-  - Trying to update locale using it will result in a `Error: invalid locale settings`
-  - The issue has been reported upstream under [Debian Bug Report #970796](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=955733)
-  - System locale should be updated manually as part of the `runcmd` section using `localectl set-locale $LOCALE_NAME` in the meantime using:
-    ```yaml
-    runcmd:
-      - localectl set-locale en_US.UTF-8
-    ```
+| Stat                   | BerryOS Bullseye (2022.05.29) | RaspiOS Lite Bullseye (2022.04.04) |
+| ---------------------- | ----------------------------- | ---------------------------------- |
+| RAM usage              | 52M                           | 72M                                |
+| Running processes      | 12                            | 20                                 |
+| Disk usage             | 611.7M                        | 1.3G                               |
+| Pre-installed packages | 285                           | 521                                |
+| Download size          | 153M                          | 271M                               |
+| Image size             | 1112M                         | 1908M                              |
 
 ## Acknowledgements
 

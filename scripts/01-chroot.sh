@@ -24,7 +24,6 @@ DEFAULT_HOSTNAME="${DEFAULT_HOSTNAME:-"berry"}"
 ## Configure Base system
 
 # Set default locale to "C.UTF-8"
-echo 'locales locales/locales_to_be_generated select en_US.UTF-8 UTF-8' | debconf-set-selections
 echo 'locales locales/default_environment_locale select C.UTF-8' | debconf-set-selections
 dpkg-reconfigure -f noninteractive locales
 
@@ -32,23 +31,16 @@ dpkg-reconfigure -f noninteractive locales
 echo "${DEFAULT_HOSTNAME}" > /etc/hostname
 echo "127.0.1.1       ${DEFAULT_HOSTNAME}" >> /etc/hosts
 
-# Disalbe predictable network interface device names (force eth0)
-ln -sf /dev/null /etc/systemd/network/99-default.link
-ln -sf /dev/null /etc/systemd/network/73-usb-net-by-mac.link
-
 # Update source.list to include extra pools
-case "${DEBIAN_VARIANT}" in
-    "Debian GNU/Linux")
-        echo "deb ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} main contrib non-free
-# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-#deb-src ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} main contrib non-free" | tee /etc/apt/sources.list
-    ;;
-    "Raspbian GNU/Linux")
-        echo "deb ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} main contrib non-free rpi
-# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-#deb-src ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} main contrib non-free rpi" | tee /etc/apt/sources.list
-    ;;
-esac
+DEBIAN_POOLS="main contrib non-free"
+if [ "${DEBIAN_VARIANT}" == "Raspbian GNU/Linux" ]; then
+    DEBIAN_POOLS="${DEBIAN_POOLS} rpi"
+fi
+(
+    echo "deb ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}"
+    echo "# Uncomment line below then 'apt-get update' to enable 'apt-get source'"
+    echo "#deb-src ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}"
+) | tee /etc/apt/sources.list
 
 # Set default systemd target to multi-user
 systemctl set-default multi-user.target
@@ -59,13 +51,16 @@ systemctl set-default multi-user.target
 RPI_GPG_KEY_URL=http://archive.raspberrypi.org/debian/raspberrypi.gpg.key
 RPI_GPG_KEYRING=/etc/apt/trusted.gpg.d/raspberrypi-archive.gpg
 wget -qO- "${RPI_GPG_KEY_URL}" | gpg --dearmor > "${RPI_GPG_KEYRING}"
-echo "deb http://archive.raspberrypi.org/debian/ ${DEBIAN_RELEASE} main
-# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-#deb-src http://archive.raspberrypi.org/debian/ ${DEBIAN_RELEASE} main" | tee /etc/apt/sources.list.d/raspberrypi.list
+(
+    echo "deb http://archive.raspberrypi.org/debian/ ${DEBIAN_RELEASE} main"
+    echo "# Uncomment line below then 'apt-get update' to enable 'apt-get source'"
+    echo "#deb-src http://archive.raspberrypi.org/debian/ ${DEBIAN_RELEASE} main"
+) | tee /etc/apt/sources.list.d/raspberrypi.list
 
 # Pin specific dependency to the raspberrypi repository
 mkdir -p "/etc/apt/preferences.d"
-echo "# Ensure that the correct firmware packages from the Raspberry Pi Foundation get installed
+tee /etc/apt/preferences.d/raspberrypi << EOF
+# Ensure that the correct firmware packages from the Raspberry Pi Foundation get installed
 
 Package: firmware-*
 Pin: origin archive.raspberrypi.org
@@ -77,7 +72,8 @@ Pin-Priority: 1001
 
 Package: raspberrypi-bootloader
 Pin: origin archive.raspberrypi.org
-Pin-Priority: 1001" | tee /etc/apt/preferences.d/raspberrypi
+Pin-Priority: 1001
+EOF
 
 # Update lists and upgrade existing package to their RPi specific counterpart
 apt-get update
@@ -100,16 +96,21 @@ apt-get install -y \
 ## Setup OS specifics
 
 # Setup OS issues
-echo "${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_VARIANT} ${DEBIAN_VERSION}) \n \l
+tee /etc/issue << EOF
+${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_VARIANT} ${DEBIAN_VERSION}) \n \l
 
 eth0 : \4{eth0}
 wlan0: \4{wlan0}
-" | tee /etc/issue
-# TODO: cleanup
-echo "${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_VARIANT} ${DEBIAN_VERSION})" | tee /etc/issue.net
+
+EOF
+tee /etc/issue.net << EOF
+echo "${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_VARIANT} ${DEBIAN_VERSION})"
+EOF
+
 
 # Setup MOTD
-echo "
+tee /etc/motd << EOF
+
 ${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_VARIANT} ${DEBIAN_VERSION})
 
 The programs included with the Debian GNU/Linux system are free software;
@@ -117,7 +118,8 @@ the exact distribution terms for each program are described in the
 individual files in /usr/share/doc/*/copyright.
 
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-permitted by applicable law." | tee /etc/motd
+permitted by applicable law.
+EOF
 
 # Add extra /etc/os-release parameters
 printf '%s_NAME="%s/%s"\n' "${OS_PREFIX}" "${OS_NAME}" "${BUILD_ARCH}" >> /etc/os-release
@@ -125,13 +127,14 @@ printf '%s_VERSION="%s"\n' "${OS_PREFIX}" "${OS_VERSION}" >> /etc/os-release
 
 ## Install & configure cloud-init
 
-# Install cloud-init and dependencies
+# Install cloud-init & netplan to handle provisioning
 apt-get install -y \
     --no-install-recommends \
     cloud-init \
-    ssh-import-id
+    ssh-import-id \
+    netplan.io
 
-# Mask dhcpcd & systemd-resolved to prevent potential conflicts with with cloud-init network config)
+# Mask dhcpcd & systemd-resolved to prevent potential conflicts with with cloud-init network config
 systemctl mask dhcpcd
 systemctl mask systemd-resolved
 
@@ -141,7 +144,7 @@ systemctl enable ssh
 # Enable network time synchronization using systemd-timesyncd
 systemctl enable systemd-timesyncd
 
-# Do not start wpa_supplicant when not needed
+# Disable wpa_supplicant as it is handled by netplan and started only when needed
 systemctl disable wpa_supplicant
 
 ## Configure Hardware RNG support
