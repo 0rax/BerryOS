@@ -1,0 +1,25 @@
+title: "BerryOS"
+repository: "0rax/BerryOS"
+remote_theme: "just-the-docs/just-the-docs"
+color_scheme: "light"
+logo: "/assets/berryos-logo.png"
+search_enabled: true
+search:
+  heading_level: 2
+  rel_url: true
+  button: false
+aux_links:
+  "BerryOS on GitHub":
+    - "https://github.com/0rax/BerryOS"
+aux_links_new_tab: true
+heading_anchors: true
+back_to_top: true
+back_to_top_text: "Back to top"
+footer_content: "Copyright &copy; 2022 Jean-Philippe Roemer. Distributed under an <a href=\"https://github.com/0rax/BerryOS/tree/main/LICENSE\">ISC license.</a>"
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub."
+gh_edit_repository: "https://github.com/0rax/BerryOS"
+gh_edit_branch: "main"
+gh_edit_source: docs
+gh_edit_view_mode: "tree"
+pa_domain: 0rax.github.io/berryos

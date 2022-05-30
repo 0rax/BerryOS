@@ -1,0 +1,12 @@
+*		text=auto
+*.png		binary
+*.jpg		binary
+*.jpeg		binary
+*.gif		binary
+*.ico		binary
+*.md		text=auto
+user-data	text eol=crlf
+meta-data	text eol=crlf
+network-config	text eol=crlf
+Gemfile*	text eol=lf
+_config.yml	text eol=lf

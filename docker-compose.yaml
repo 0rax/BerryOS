@@ -10,3 +10,23 @@ services:
       - .:/opt/bootstrap
     working_dir: /opt/bootstrap
     privileged: true
+  docs:
+    image: berryos-jekyll
+    build:
+      context: .
+      dockerfile: Dockerfile.docs
+    environment:
+      - JEKYLL_ENV=docker
+    volumes:
+      - ./docs:/opt/docs:z
+    ports:
+      - 4000:4000
+    command:
+      - bundle
+      - exec
+      - jekyll
+      - serve
+      - --config
+      - _config.yml,_config.docker.yml
+      - --host
+      - 0.0.0.0

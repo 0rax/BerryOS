@@ -10,7 +10,7 @@ all: armhf arm64
 
 builder:
 	$(info [BerryOS] Prepare builder)
-	docker compose build
+	docker compose build builder
 
 armhf: builder
 	$(info [BerryOS] Build for armhf)

@@ -11,17 +11,6 @@
 # # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#set-hostname
 # # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#update-etc-hosts
 
-# ## Configure NTP pools
-# ntp:
-#   enabled: true                     # Enable NTP module
-#   pools:                            # Specift custom pool uri
-#     - 0.uk.pool.ntp.org
-#     - 1.uk.pool.ntp.org
-#     - 2.uk.pool.ntp.org
-#     - 3.uk.pool.ntp.org
-# # Reference(s):
-# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#ntp
-
 # ## Configure default user access
 # password: berryos                   # Set default user password
 # chpasswd: { expire: false }         # Do not expire password after first login
@@ -44,7 +33,7 @@
 #     shell: /bin/bash                # Set user default shell
 #     groups:                         # Set user groups
 #       [adm, dialout, cdrom, sudo, audio, video, plugdev, games, users, input, render, netdev]
-#     plain_text_passwd: berryos      # Set user password
+#     passwd: berryos                 # Set user password
 #     chpasswd: { expire: false }     # Do not expire password after first login
 #     ssh_pwauth: true                # Allow SSH password auth for the user
 #     ssh_authorized_keys:            # Set SSH authorized keys for the user
@@ -59,6 +48,17 @@
 # timezone: "Europe/London"           # Timezone value must exist in /usr/share/zoneinfo
 # # Reference(s):
 # # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#timezone
+
+# ## Configure NTP pools
+# ntp:
+#   enabled: true                     # Enable NTP module
+#   pools:                            # Specift custom pool uri
+#     - 0.uk.pool.ntp.org
+#     - 1.uk.pool.ntp.org
+#     - 2.uk.pool.ntp.org
+#     - 3.uk.pool.ntp.org
+# # Reference(s):
+# # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#ntp
 
 # # Update package list, upgrade system or install new packages on first boot
 # package_update: true                # Update package list

@@ -1,0 +1,7 @@
+{
+  "default": true,
+  "no-hard-tabs": true,
+  "line_length": false,
+  "MD025": false,
+  "MD022": false
+}

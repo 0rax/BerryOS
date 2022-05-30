@@ -2,19 +2,25 @@
 # vim: syntax=yaml
 #
 
-hostname: berryos-docker-arm64
+## Setup hostname
+hostname: berryos-docker-armhf
 manage_etc_hosts: true
 
+## Create users (respect OS default)
 users:
   - default
 
-timezone: "Etc/UTC"
+## Configure default user access
+password: berryosd
+chpasswd: { expire: false }
+ssh_pwauth: true
 
+## Add `docker-ce` APT repository
 apt:
   preserve_sources_list: true
   sources:
     docker-ce.list:
-      source: "deb https://download.docker.com/linux/debian bullseye stable"
+      source: "deb [arch=armhf] https://download.docker.com/linux/raspbian bullseye stable"
       key: |
         -----BEGIN PGP PUBLIC KEY BLOCK-----
 
@@ -79,6 +85,7 @@ apt:
         =0YYh
         -----END PGP PUBLIC KEY BLOCK-----
 
+## Update system and install required packages
 package_update: true
 package_upgrade: false
 packages:
@@ -86,6 +93,7 @@ packages:
   - docker-ce-cli
   - docker-compose-plugin
 
+## Start and enable docker & add the default user to the docker group
 runcmd:
   - systemctl enable --now docker
   - usermod -aG docker pi

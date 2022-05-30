@@ -2,4 +2,7 @@
 *.sh		text eol=lf
 *.yaml		text eol=lf
 Makefile	text eol=lf
-Dockerfile	text eol=lf
+Dockerfile*	text eol=lf
+*.dockerignore	text eol=lf
+*.gitattributes text
+.gitignore	text

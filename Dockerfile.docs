@@ -1,0 +1,6 @@
+# syntax=docker/dockerfile:1.2
+FROM ruby:3.1
+
+WORKDIR /opt/docs
+COPY docs/Gemfile docs/Gemfile.lock /opt/docs/
+RUN bundle install

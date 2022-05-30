@@ -1,10 +1,10 @@
-# ![BerryOS](https://github.com/0rax/BerryOS/wiki/assets/berryos-banner.png)
+# ![BerryOS](docs/assets/berryos-banner.png)
 
 ## What is BerryOS ?
 
 BerryOS is a lightweight distribution of Raspberry Pi OS, meant to be used as a clean base when configuring a new Raspberry Pi. It focuses on providing a lighter operating system than can be configured headlessly at first boot.
 
-It was born out of the frustration of not being able to configure Raspberry Pi OS Lite using [`cloud-init`](https://cloudinit.readthedocs.io/en/latest/index.html) easily and the fact that alternatives such as Ubuntu includes way too many pieces of software by default (such as `snapd` or `unattended-upgrades` which can chew RAM and CPU cycles).
+It was born out of the frustration of not being able to configure Raspberry Pi OS Lite using [`cloud-init`](https://cloud-init.io/) easily and the fact that alternatives such as Ubuntu includes way too many pieces of software by default (such as `snapd` or `unattended-upgrades` which can chew RAM and CPU cycles).
 
 ## Overview
 
@@ -37,8 +37,8 @@ The goal of the images provided by BerryOS is to provide a similar user experien
 
 To do so, BerryOS is bootstrapped from the same base as Raspberry Pi OS Lite with a reduced list of package installed by default and the following changes to the default configuration:
 
-- Addition of `cloud-init` to handle unattended provisioning at first boot
-- Addition of `netplan` to handle Wi-Fi configuration using `cloud-init`
+- Addition of [`cloud-init`](https://cloud-init.io/) to handle unattended provisioning at first boot
+- Addition of [`netplan`](https://netplan.io/) to handle Wi-Fi configuration using `cloud-init`
 - `openssh` enabled by default
 - Serial console disabled by default
 - Bluetooth support not configured by default
@@ -77,7 +77,7 @@ This default environment will also try to:
 - Unmount your SD card, insert it in your Raspberry Pi, plug your Ethernet cable and provide it with power
 - Congratulation, you are now running BerryOS !
 
-More complex configuration scenario are available under the [`examples` folder](examples/) or in [this project wiki](https://github.com/0rax/BerryOS/wiki).
+A more detailed explanation of most of what can be configured using `cloud-init` is available in [this project documentation](https://0rax.github.io/BerryOS/docs/config/). A set of [example `user-data` file](https://0rax.github.io/BerryOS/docs/examples/) is also available.
 
 ## Benchmark
 
@@ -92,7 +92,7 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 ### `BerryOS/armhf`
 
-| Stat                   | BerryOS Bullseye (2022.05.29) | RaspiOS Lite Bullseye (2022.04.04) |
+| Stat                   | BerryOS Bullseye (2022.05.30) | RaspiOS Lite Bullseye (2022.04.04) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
 | RAM usage              | 37M                           | 57M                                |
 | Running processes      | 12                            | 18                                 |
@@ -103,7 +103,7 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 ### `BerryOS/arm64`
 
-| Stat                   | BerryOS Bullseye (2022.05.29) | RaspiOS Lite Bullseye (2022.04.04) |
+| Stat                   | BerryOS Bullseye (2022.05.30) | RaspiOS Lite Bullseye (2022.04.04) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
 | RAM usage              | 52M                           | 72M                                |
 | Running processes      | 12                            | 20                                 |

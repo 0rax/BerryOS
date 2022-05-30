@@ -10,7 +10,12 @@ manage_etc_hosts: true
 users:
   - default
 
-## Setup extra APT source.list
+## Configure default user access
+password: berryosd
+chpasswd: { expire: false }
+ssh_pwauth: true
+
+## Add `azlux` APT repository
 apt:
   preserve_sources_list: true
   sources:
@@ -96,6 +101,7 @@ write_files:
       COMP_ALG=lz4
       LOG_DISK_SIZE=150M
 
+## Start log2ram on boot
 runcmd:
   - systemctl enable log2ram
 
