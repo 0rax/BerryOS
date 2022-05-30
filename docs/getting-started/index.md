@@ -1,7 +1,7 @@
 ---
 title: Getting Started
 nav_order: 3
-permalinkg: /docs/getting-started/
+permalink: /docs/getting-started/
 ---
 
 # Getting Started

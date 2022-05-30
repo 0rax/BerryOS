@@ -1,7 +1,7 @@
 ---
 title: Overview
 nav_order: 2
-permalinkg: /docs/overview/
+permalink: /docs/overview/
 ---
 
 # Overview
