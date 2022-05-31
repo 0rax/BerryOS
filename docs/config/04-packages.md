@@ -68,4 +68,4 @@ apt:
         -----END PGP PUBLIC KEY BLOCK-----
 ```
 
-A complete configuration that also install and configure `docker` is available [here](https://github.com/0rax/BerryOS/blob/main/examples).
+A complete configuration that also install and configure `docker` is available [here](https://0rax.github.io/BerryOS/docs/examples/docker-ce/).
