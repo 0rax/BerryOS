@@ -24,8 +24,8 @@ ROOTFS_TAR="${OUTPUT_DIR}/${OS_NAME,,}-${BUILD_ARCH}-${DEBIAN_RELEASE}-${OS_VERS
 ROOTFS_PKGS="${OUTPUT_DIR}/${OS_NAME,,}-${BUILD_ARCH}-${DEBIAN_RELEASE}-${OS_VERSION//.}-packages.txt"
 
 ## Debootstrap config
-DEFAULT_PACKAGES_INCLUDE="apt-transport-https,binutils,ca-certificates,gpg,gpgv,locales,net-tools,wireless-tools,rfkill,wpasupplicant,openssh-server,parted,sudo,usbutils,wget,libpam-systemd,systemd-timesyncd,resolvconf,lsb-release,gettext"
-DEFAULT_PACKAGES_EXCLUDE="debfoster,ntp,vim,vim-tiny,vim-common,info,man-db"
+DEFAULT_PACKAGES_INCLUDE="apt-transport-https,binutils,ca-certificates,gpg,gpgv,locales,net-tools,wireless-tools,rfkill,wpasupplicant,openssh-server,sudo,usbutils,wget,libpam-systemd,systemd-timesyncd,resolvconf,lsb-release,gettext"
+DEFAULT_PACKAGES_EXCLUDE="debfoster,ntp,info,man-db,paxctld,groff-base,install-info,traceroute,netcat-openbsd"
 
 setup_debootstrap () {
     # Configure debootstrap based on DEBIAN_RELEASE
