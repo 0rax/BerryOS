@@ -3,6 +3,7 @@ title: Package Management
 parent: Configuration
 nav_order: 4
 permalink: /docs/config/packages/
+lastmod: 2022-06-11T16:59:07.081Z
 ---
 
 # Package Management
@@ -68,4 +69,4 @@ apt:
         -----END PGP PUBLIC KEY BLOCK-----
 ```
 
-A complete configuration that also install and configure `docker` is available [here](https://0rax.github.io/BerryOS/docs/examples/docker-ce/).
+A complete configuration that also install and configure `docker` is available [here](/docs/examples/docker-ce/).

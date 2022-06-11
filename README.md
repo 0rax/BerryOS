@@ -77,7 +77,7 @@ This default environment will also try to:
 - Unmount your SD card, insert it in your Raspberry Pi, plug your Ethernet cable and provide it with power
 - Congratulation, you are now running BerryOS !
 
-A more detailed explanation of most of what can be configured using `cloud-init` is available in [this project documentation](https://0rax.github.io/BerryOS/docs/config/). A set of [example `user-data` file](https://0rax.github.io/BerryOS/docs/examples/) is also available.
+A more detailed explanation of most of what can be configured using `cloud-init` is available in [this project documentation](https://berryos.wiki/docs/config/). A set of [example `user-data` file](https://berryos.wiki/docs/examples/) is also available.
 
 ## Benchmark
 
