@@ -23,3 +23,5 @@ gh_edit_branch: "main"
 gh_edit_source: docs
 gh_edit_view_mode: "tree"
 pa_domain: berryos.wiki
+plugins:
+  - jekyll-sitemap

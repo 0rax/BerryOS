@@ -265,6 +265,7 @@ PLATFORMS
 DEPENDENCIES
   github-pages
   http_parser.rb (~> 0.6.0)
+  jekyll-sitemap
   kramdown-parser-gfm
   rouge
   rubyzip (~> 2.3.0)
