@@ -91,7 +91,8 @@ apt-get install -y \
     firmware-realtek \
     libraspberrypi0 \
     libraspberrypi-bin \
-    raspi-config
+    raspi-config \
+    raspberrypi-sys-mods
 
 ## Setup OS specifics
 
