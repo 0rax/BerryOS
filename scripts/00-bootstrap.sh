@@ -13,8 +13,8 @@ BUILD_ARCH="${BUILD_ARCH:-armhf}"
 
 ## Debian base
 DEBIAN_VARIANT="Debian GNU/Linux"
-DEBIAN_VERSION="${DEBIAN_VERSION:-"11"}"
-DEBIAN_RELEASE="${DEBIAN_RELEASE:-"bullseye"}"
+DEBIAN_VERSION="${DEBIAN_VERSION:-"12"}"
+DEBIAN_RELEASE="${DEBIAN_RELEASE:-"bookworm"}"
 
 ## Build path
 BUILD_DIR="${BUILD_DIR:-/opt/bootstrap}"

@@ -1,6 +1,6 @@
 OS_NAME		?= BerryOS
 OS_VERSION	?= $(shell date "+%Y.%m.%d")
-DEBIAN_RELEASE	?= bullseye
+DEBIAN_RELEASE	?= bookworm
 
 .DEFAULT: armhf
 

@@ -10,7 +10,7 @@ fi
 OS_NAME="${OS_NAME:-"BerryOS"}"
 OS_VERSION="${OS_VERSION?}"
 BUILD_ARCH="${BUILD_ARCH?}"
-DEBIAN_RELEASE="${DEBIAN_RELEASE:-"bullseye"}"
+DEBIAN_RELEASE="${DEBIAN_RELEASE:-"bookworm"}"
 
 ## Build path
 BUILD_DIR="${BUILD_DIR:-/opt/bootstrap}"
