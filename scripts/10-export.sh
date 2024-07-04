@@ -68,13 +68,13 @@ mount_image () {
     sleep 3
 
     # Create file systems
-    mkfs.vfat "${BOOT_DEV}" -n "boot"
+    mkfs.vfat "${BOOT_DEV}" -n "bootfs"
     mkfs.ext4 "${ROOT_DEV}" -L "rootfs" -F -i 4096 # create 1 inode per 4kByte block (maximum ratio is 1 per 1kByte)
 
     # Mount file systems
     mount -v "${ROOT_DEV}" "/mnt" -t ext4
-    mkdir -p "/mnt/boot"
-    mount -v "${BOOT_DEV}" "/mnt/boot" -t vfat
+    mkdir -p "/mnt/boot/firmware"
+    mount -v "${BOOT_DEV}" "/mnt/boot/firmware" -t vfat
 }
 
 patch_rootfs () {

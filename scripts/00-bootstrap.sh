@@ -105,13 +105,13 @@ configure_rootfs () {
     # Copy static system configuration files
     install -Dm 0644 -t "${ROOTFS_DIR}/boot" \
         "${FILES_DIR}/boot/cmdline.txt" \
-        "${FILES_DIR}/boot/config.txt" \
-        "${FILES_DIR}/boot/meta-data" \
-        "${FILES_DIR}/boot/network-config" \
-        "${FILES_DIR}/boot/user-data"
+        "${FILES_DIR}/boot/config.txt"
     install -Dm 0644 -t "${ROOTFS_DIR}/boot/firmware" \
         "${FILES_DIR}/boot/firmware/cmdline.txt" \
-        "${FILES_DIR}/boot/firmware/config.txt"
+        "${FILES_DIR}/boot/firmware/config.txt" \
+        "${FILES_DIR}/boot/firmware/meta-data" \
+        "${FILES_DIR}/boot/firmware/network-config" \
+        "${FILES_DIR}/boot/firmware/user-data"
     install -Dm 0644 -t "${ROOTFS_DIR}/etc" \
         "${FILES_DIR}/etc/fstab" \
         "${FILES_DIR}/etc/resolv.conf"

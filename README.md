@@ -82,7 +82,7 @@ A more detailed explanation of most of what can be configured using `cloud-init`
 
 ## Benchmark
 
-Benchmarked on a Raspberry Pi 3 B connected via Ethernet using DHCP with the following commands after first-boot:
+Benchmarked on a Raspberry Pi 3 B+ connected via Ethernet using DHCP running the following commands over ssh after first-boot:
 
 - RAM usage: `free -th | mawk '/^Total:/{print $3}'`
 - Running processes: `pstree -Ta` (removing `sshd` & `systemctl --user` session)
@@ -95,23 +95,23 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 | Stat                   | BerryOS Bookworm (2024.07.04) | RaspiOS Lite Bookworm (2024-03-12) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
-| RAM usage              | 37M                           | 57M                                |
-| Running processes      | 12                            | 18                                 |
-| Disk usage             | 787M                          | 1.3G                               |
-| Pre-installed packages | 309                           | 530                                |
-| Download size          | 200M                          | 297M                               |
-| Image size             | 1312M                         | 1924M                              |
+| RAM usage              | 37M                           | 106M                               |
+| Running processes      | 12                            | 16                                 |
+| Disk usage             | 787M                          | 1.6G                               |
+| Pre-installed packages | 309                           | 601                                |
+| Download size          | 200M                          | 475M                               |
+| Image size             | 1312M                         | 2424M                              |
 
 ### `BerryOS/arm64`
 
 | Stat                   | BerryOS Bookworm (2024.07.04) | RaspiOS Lite Bookworm (2024-03-12) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
-| RAM usage              | 52M                           | 72M                                |
-| Running processes      | 12                            | 20                                 |
-| Disk usage             | 614M                          | 1.3G                               |
-| Pre-installed packages | 288                           | 521                                |
-| Download size          | 154M                          | 271M                               |
-| Image size             | 1116M                         | 1908M                              |
+| RAM usage              | 52M                           | 124M                               |
+| Running processes      | 12                            | 16                                 |
+| Disk usage             | 614M                          | 1.7G                               |
+| Pre-installed packages | 288                           | 588                                |
+| Download size          | 154M                          | 415M                               |
+| Image size             | 1116M                         | 2640M                              |
 
 ## Acknowledgements
 

@@ -75,7 +75,7 @@
 #     permissions: "0644"             # File permission
 #     owner: "root:root"              # File ownership
 #     content: |                      # File content
-#       Hello BerrOS !
+#       Hello BerryOS !
 # # Reference(s):
 # # - https://cloudinit.readthedocs.io/en/latest/topics/modules.html#write-files
 
