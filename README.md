@@ -45,7 +45,7 @@ To do so, BerryOS is bootstrapped from the same base as Raspberry Pi OS Lite wit
 - Bluetooth support not configured by default
 - No swapfile configured by default
 - `wpa_supplicant` installed and configured but disabled by default
-- Support for `/boot/config.toml` has been removed in favor of `cloud-init` (see [#5](https://github.com/0rax/BerryOS/pull/5))
+- Support for `/boot/config.toml` removed in favor of `cloud-init` (see [#5](https://github.com/0rax/BerryOS/pull/5) and [#15](https://github.com/0rax/BerryOS/pull/15))
 
 On the other hand, some services have been kept as is from Raspberry Pi such as:
 
