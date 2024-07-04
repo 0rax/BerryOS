@@ -81,10 +81,10 @@ patch_rootfs () {
     # Create mount points
     mkdir -p "${ROOTFS_DIR}"/{proc,sys,dev/pts}
 
-    # Inject PARTUUID in /etc/fstab & /boot/cmdline.txt
+    # Inject PARTUUID in /etc/fstab & /boot/firmware/cmdline.txt
     sed -i "s/BOOTDEV/PARTUUID=${BOOT_PARTUUID}/" "${ROOTFS_DIR}/etc/fstab"
     sed -i "s/ROOTDEV/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/etc/fstab"
-    sed -i "s/ROOTDEV/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/boot/cmdline.txt"
+    sed -i "s/ROOTDEV/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/boot/firmware/cmdline.txt"
 
     # Reset machine-id
     rm -f "${ROOTFS_DIR}/var/lib/dbus/machine-id"
@@ -96,13 +96,13 @@ patch_rootfs () {
 
 sync_rootfs () {
     # Copy rootfs content to mounted file systems
-    rsync -aHAXx --exclude /var/cache/apt/archives --exclude /boot "${ROOTFS_DIR}/" "/mnt"
-    rsync -rtx "${ROOTFS_DIR}/boot/" "/mnt/boot/"
+    rsync -aHAXx --exclude /var/cache/apt/archives --exclude /boot/firmware "${ROOTFS_DIR}/" "/mnt"
+    rsync -rtx "${ROOTFS_DIR}/boot/firmware/" "/mnt/boot/firmware/"
 }
 
 umount_image () {
     # Unmount filesystems
-    umount /mnt/boot
+    umount /mnt/boot/firmware
     umount /mnt
 
     # Zero unallocated blocks using zerofree to enhance compression

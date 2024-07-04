@@ -22,6 +22,7 @@ BerryOS is available in two variant, a 32-bit version called `BerryOS/armhf` and
   - Raspberry Compute Module 3 +
   - Raspberry Compute Module 4
   - Raspberry Pi Zero 2 W
+  - Raspberry Pi 5
 
 Each release is tested on the following hardware:
 
@@ -98,9 +99,9 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 | RAM usage              | 37M                           | 106M                               |
 | Running processes      | 12                            | 16                                 |
 | Disk usage             | 787M                          | 1.6G                               |
-| Pre-installed packages | 309                           | 601                                |
-| Download size          | 200M                          | 475M                               |
-| Image size             | 1312M                         | 2424M                              |
+| Pre-installed packages | 308                           | 601                                |
+| Download size          | 301M                          | 475M                               |
+| Image size             | 1260M                         | 2424M                              |
 
 ### `BerryOS/arm64`
 
@@ -109,14 +110,14 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 | RAM usage              | 52M                           | 124M                               |
 | Running processes      | 12                            | 16                                 |
 | Disk usage             | 614M                          | 1.7G                               |
-| Pre-installed packages | 288                           | 588                                |
-| Download size          | 154M                          | 415M                               |
-| Image size             | 1116M                         | 2640M                              |
+| Pre-installed packages | 306                           | 588                                |
+| Download size          | 273M                          | 415M                               |
+| Image size             | 1356M                         | 2640M                              |
 
 ## Acknowledgements
 
 This project has been heavily inspired by the work previously done by the team at [Hypriot](https://github.com/hypriot) for their HypriotOS. It was the starting point of this project and this project wouldn't exist without it.
 
-The [RPi-Distro/pi-gen](https://github.com/RPi-Distro/pi-gen) & [RPi-Distro/raspi-config](https://github.com/RPi-Distro/raspi-config) projects have also been very helpful when tackling some hardware specific issues and optimizing image creation.
+The [RPi-Distro/pi-gen](https://github.com/RPi-Distro/pi-gen), [RPi-Distro/raspi-config](https://github.com/RPi-Distro/raspi-config) & [RPi-Distro/raspberrypi-sys-mods](https://github.com/RPi-Distro/raspberrypi-sys-mods/) projects have also been very helpful when tackling some hardware specific issues and optimizing image creation.
 
 To the team responsible for those great pieces of software, thank you !

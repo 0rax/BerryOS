@@ -112,6 +112,8 @@ configure_rootfs () {
         "${FILES_DIR}/boot/firmware/meta-data" \
         "${FILES_DIR}/boot/firmware/network-config" \
         "${FILES_DIR}/boot/firmware/user-data"
+    install -Dm 0755 -t "${ROOTFS_DIR}/usr/lib/berryos" \
+        "${FILES_DIR}/usr/lib/berryos/berryos-firstboot"
     install -Dm 0644 -t "${ROOTFS_DIR}/etc" \
         "${FILES_DIR}/etc/fstab" \
         "${FILES_DIR}/etc/resolv.conf"

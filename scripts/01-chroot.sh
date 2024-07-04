@@ -82,12 +82,16 @@ apt-get install -y \
     firmware-misc-nonfree \
     firmware-realtek \
     raspi-firmware \
-    raspi-config
+    raspi-config \
+    raspberrypi-sys-mods
 
 # Disable initramfs updates if any package installed after triggers them, initramfs will be regenenerated and update reneabled in the last step here
 if [ -f /etc/initramfs-tools/update-initramfs.conf ]; then
     sed -i 's/^update_initramfs=.*/update_initramfs=no/' /etc/initramfs-tools/update-initramfs.conf
 fi
+
+# Remove /etc/sudoers.d/010_pi-nopasswd installed by `raspberrypi-sys-mods`, user account creation and allowing them to assume root is handled by `clout-init`
+rm -f /etc/sudoers.d/010_pi-nopasswd
 
 ## Setup OS specifics
 
