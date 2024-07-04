@@ -8,7 +8,7 @@ fi
 
 ## Build config
 OS_NAME="${OS_NAME:-"BerryOS"}"
-OS_VERSION="${OS_VERSION:-$(date "+%Y.%m.%d")}"
+OS_VERSION="${OS_VERSION:-$(date --utc "+%Y.%m.%d")}"
 OS_REPO="${OS_REPO:-"https://github.com/0rax/BerryOS"}"
 BUILD_ARCH="${BUILD_ARCH:-armhf}"
 GIT_HASH="${GIT_HASH:-"main"}"

@@ -1,5 +1,5 @@
 OS_NAME		?= BerryOS
-OS_VERSION	?= $(shell date "+%Y.%m.%d")
+OS_VERSION	?= $(shell date --utc "+%Y.%m.%d")
 OS_REPO		?= https://github.com/0rax/BerryOS
 GIT_HASH	?= $(shell git rev-parse HEAD)
 DEBIAN_VERSION	?= 12
