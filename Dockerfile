@@ -6,4 +6,4 @@ RUN apt-get update -y -qq \
             make debootstrap qemu-user-static binfmt-support file \
             parted kpartx dosfstools zerofree xxd \
             rsync wget ca-certificates gpg \
-            bc xz-utils
+            bc xz-utils git

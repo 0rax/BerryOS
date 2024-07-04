@@ -43,7 +43,8 @@ To do so, BerryOS is bootstrapped from the same base as Raspberry Pi OS Lite wit
 - Serial console disabled by default
 - Bluetooth support not configured by default
 - No swapfile configured by default
-- `wpa_supplicant` installed and configured by disabled by default
+- `wpa_supplicant` installed and configured but disabled by default
+- Support for `/boot/config.toml` has been removed in favor of `cloud-init` (see [#5](https://github.com/0rax/BerryOS/pull/5))
 
 On the other hand, some services have been kept as is from Raspberry Pi such as:
 
@@ -92,7 +93,7 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 ### `BerryOS/armhf`
 
-| Stat                   | BerryOS Bullseye (2022.06.11) | RaspiOS Lite Bullseye (2022.04.04) |
+| Stat                   | BerryOS Bookworm (2024.07.04) | RaspiOS Lite Bookworm (2024-03-12) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
 | RAM usage              | 37M                           | 57M                                |
 | Running processes      | 12                            | 18                                 |
@@ -103,7 +104,7 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 ### `BerryOS/arm64`
 
-| Stat                   | BerryOS Bullseye (2022.06.11) | RaspiOS Lite Bullseye (2022.04.04) |
+| Stat                   | BerryOS Bookworm (2024.07.04) | RaspiOS Lite Bookworm (2024-03-12) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
 | RAM usage              | 52M                           | 72M                                |
 | Running processes      | 12                            | 20                                 |

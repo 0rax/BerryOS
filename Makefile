@@ -1,5 +1,7 @@
 OS_NAME		?= BerryOS
 OS_VERSION	?= $(shell date "+%Y.%m.%d")
+OS_REPO		?= https://github.com/0rax/BerryOS
+GIT_HASH	?= $(shell git rev-parse HEAD)
 DEBIAN_RELEASE	?= bookworm
 
 .DEFAULT: armhf
@@ -35,7 +37,13 @@ arm64: builder
 rootfs: BUILD_ARCH ?= armhf
 rootfs:
 	$(info [BerryOS/$(BUILD_ARCH)] Bootstrap rootfs)
-	env OS_NAME=$(OS_NAME) OS_VERSION="$(OS_VERSION)" DEBIAN_RELEASE="$(DEBIAN_RELEASE)" BUILD_ARCH="$(BUILD_ARCH)" ./scripts/00-bootstrap.sh
+	env OS_NAME=$(OS_NAME) \
+	    OS_VERSION="$(OS_VERSION)" \
+	    OS_REPO="$(OS_REPO)" \
+	    GIT_HASH="$(GIT_HASH)" \
+	    DEBIAN_RELEASE="$(DEBIAN_RELEASE)" \
+	    BUILD_ARCH="$(BUILD_ARCH)" \
+	    ./scripts/00-bootstrap.sh
 
 image: BUILD_ARCH ?= armhf
 image:

@@ -9,7 +9,9 @@ fi
 ## Build config
 OS_NAME="${OS_NAME:-"BerryOS"}"
 OS_VERSION="${OS_VERSION:-$(date "+%Y.%m.%d")}"
+OS_REPO="${OS_REPO:-"https://github.com/0rax/BerryOS"}"
 BUILD_ARCH="${BUILD_ARCH:-armhf}"
+GIT_HASH="${GIT_HASH:-"main"}"
 
 ## Debian base
 DEBIAN_VARIANT="Debian GNU/Linux"
@@ -24,30 +26,14 @@ ROOTFS_TAR="${OUTPUT_DIR}/${OS_NAME,,}-${BUILD_ARCH}-${DEBIAN_RELEASE}-${OS_VERS
 ROOTFS_PKGS="${OUTPUT_DIR}/${OS_NAME,,}-${BUILD_ARCH}-${DEBIAN_RELEASE}-${OS_VERSION//.}-packages.txt"
 
 ## Debootstrap config
-DEFAULT_PACKAGES_INCLUDE="apt-transport-https,binutils,ca-certificates,gpg,gpgv,gpg-agent,locales,net-tools,wireless-tools,rfkill,wpasupplicant,openssh-server,sudo,usbutils,wget,libpam-systemd,systemd-timesyncd,resolvconf,lsb-release,gettext"
+DEFAULT_PACKAGES_INCLUDE="apt-transport-https,binutils,ca-certificates,gpg,gpgv,gpg-agent,locales,net-tools,wireless-tools,rfkill,wpasupplicant,openssh-server,sudo,usbutils,wget,dbus,libpam-systemd,systemd-timesyncd,resolvconf,lsb-release,gettext,zstd"
 DEFAULT_PACKAGES_EXCLUDE="debfoster,ntp,info,man-db,paxctld,groff-base,install-info,traceroute,netcat-openbsd"
 
 setup_debootstrap () {
     # Configure debootstrap based on DEBIAN_RELEASE
-    DEBOOTSTRAP_URL="http://ftp.debian.org/debian/"
+    DEBOOTSTRAP_URL="http://deb.debian.org/debian"
     GPG_KEYRING="/usr/share/keyrings/debian-${DEBIAN_RELEASE}-archive-keyring.gpg"
     GPG_KEY_URL="https://ftp-master.debian.org/keys/archive-key-${DEBIAN_VERSION}.asc"
-
-    # Verify BUILD_ARCH is supported and use Raspbian when armhf
-    case "${BUILD_ARCH}" in
-        armhf)
-            DEBIAN_VARIANT="Raspbian GNU/Linux"
-            DEBOOTSTRAP_URL="http://raspbian.raspberrypi.org/raspbian/"
-            GPG_KEY_URL="http://raspbian.raspberrypi.org/raspbian.public.key"
-            GPG_KEYRING="/usr/share/keyrings/raspbian-archive-keyring.gpg"
-        ;;
-        arm64)
-        ;;
-        *)
-            echo "Unsupported BUILD_ARCH (${BUILD_ARCH})" 1>&2
-            exit 1
-        ;;
-    esac
 
     # Fetch and configure keyring if needed
     DEBOOTSTRAP_KEYRING_OPTION=""
@@ -87,7 +73,7 @@ bootstrap_rootfs () {
     # Bootstrap system
     mkdir -p "${ROOTFS_DIR}"
     debootstrap \
-        ${DEBOOTSTRAP_KEYRING_OPTION} \
+        "${DEBOOTSTRAP_KEYRING_OPTION}" \
         --arch="${BUILD_ARCH}" \
         --include="${DEFAULT_PACKAGES_INCLUDE}" \
         --exclude="${DEFAULT_PACKAGES_EXCLUDE}" \
@@ -113,6 +99,8 @@ configure_rootfs () {
         DEBIAN_VERSION="${DEBIAN_VERSION}" \
         OS_NAME="${OS_NAME}" \
         OS_VERSION="${OS_VERSION}" \
+	    OS_REPO="${OS_REPO}" \
+        GIT_HASH="${GIT_HASH}" \
         DEBOOTSTRAP_URL="${DEBOOTSTRAP_URL}" \
         /bin/bash < "${BUILD_DIR}/scripts/01-chroot.sh"
     chroot "${ROOTFS_DIR}" dpkg --get-selections | awk '{ print $1 }' > "${ROOTFS_PKGS}"
@@ -124,6 +112,9 @@ configure_rootfs () {
         "${FILES_DIR}/boot/meta-data" \
         "${FILES_DIR}/boot/network-config" \
         "${FILES_DIR}/boot/user-data"
+    install -Dm 0644 -t "${ROOTFS_DIR}/boot/firmware" \
+        "${FILES_DIR}/boot/firmware/cmdline.txt" \
+        "${FILES_DIR}/boot/firmware/config.txt"
     install -Dm 0644 -t "${ROOTFS_DIR}/etc" \
         "${FILES_DIR}/etc/fstab" \
         "${FILES_DIR}/etc/resolv.conf"
