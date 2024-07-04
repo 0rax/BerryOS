@@ -9,13 +9,10 @@ fi
 ## Build config
 OS_NAME="${OS_NAME?}"
 OS_VERSION="${OS_VERSION?}"
-OS_PREFIX="${OS_PREFIX:-${OS_NAME^^}}"
 BUILD_ARCH="${BUILD_ARCH:-$(dpkg --print-architecture)}"
 
 ## Debian base
-DEBIAN_VARIANT="${DEBIAN_VARIANT?}"
 DEBIAN_RELEASE="${DEBIAN_RELEASE?}"
-DEBIAN_VERSION="${DEBIAN_VERSION?}"
 DEBOOTSTRAP_URL="${DEBOOTSTRAP_URL?}"
 
 ## System config
@@ -67,7 +64,7 @@ case "${BUILD_ARCH}" in
         KERNEL_IMAGES="linux-image-rpi-v6 linux-image-rpi-v7 linux-image-rpi-v7l"
     ;;
     arm64)
-        KERNEL_IMAGES="linux-image-rpi-v8"
+        KERNEL_IMAGES="linux-image-rpi-v8 linux-image-rpi-2712"
     ;;
 esac
 
@@ -97,7 +94,7 @@ fi
 # Setup rpi-issue
 tee /etc/rpi-issue << EOF
 ${OS_NAME} ${OS_VERSION}
-Generated using berryos-bootstrapper, ${OS_REPO}, ${GIT_HASH}, ${BUILD_ARCH}
+Generated using berryos-builder, ${OS_REPO}, ${GIT_HASH}, ${BUILD_ARCH}
 EOF
 
 install -m 644 /etc/rpi-issue /boot/firmware/issue.txt
@@ -106,9 +103,10 @@ if ! [ -L /boot/issue.txt ]; then
 fi
 
 # Setup MOTD
+DEBIAN_ISSUE=$(cat /etc/issue.net)
 tee /etc/motd << EOF
 
-${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_VARIANT} ${DEBIAN_VERSION})
+${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_ISSUE})
 
 The programs included with the Debian GNU/Linux system are free software;
 the exact distribution terms for each program are described in the

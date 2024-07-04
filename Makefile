@@ -2,6 +2,7 @@ OS_NAME		?= BerryOS
 OS_VERSION	?= $(shell date "+%Y.%m.%d")
 OS_REPO		?= https://github.com/0rax/BerryOS
 GIT_HASH	?= $(shell git rev-parse HEAD)
+DEBIAN_VERSION	?= 12
 DEBIAN_RELEASE	?= bookworm
 
 .DEFAULT: armhf
@@ -19,6 +20,9 @@ armhf: builder
 	docker compose run builder make rootfs image \
 	    OS_NAME="$(OS_NAME)" \
 	    OS_VERSION="$(OS_VERSION)" \
+	    OS_REPO="$(OS_REPO)" \
+	    GIT_HASH="$(GIT_HASH)" \
+	    DEBIAN_VERSION="$(DEBIAN_VERSION)" \
 	    DEBIAN_RELEASE="$(DEBIAN_RELEASE)" \
 	    BUILD_ARCH=armhf
 
@@ -27,6 +31,9 @@ arm64: builder
 	docker compose run builder make rootfs image \
 	    OS_NAME="$(OS_NAME)" \
 	    OS_VERSION="$(OS_VERSION)" \
+	    OS_REPO="$(OS_REPO)" \
+	    GIT_HASH="$(GIT_HASH)" \
+	    DEBIAN_VERSION="$(DEBIAN_VERSION)" \
 	    DEBIAN_RELEASE="$(DEBIAN_RELEASE)" \
 	    BUILD_ARCH=arm64
 
@@ -41,6 +48,7 @@ rootfs:
 	    OS_VERSION="$(OS_VERSION)" \
 	    OS_REPO="$(OS_REPO)" \
 	    GIT_HASH="$(GIT_HASH)" \
+	    DEBIAN_VERSION="$(DEBIAN_VERSION)" \
 	    DEBIAN_RELEASE="$(DEBIAN_RELEASE)" \
 	    BUILD_ARCH="$(BUILD_ARCH)" \
 	    ./scripts/00-bootstrap.sh

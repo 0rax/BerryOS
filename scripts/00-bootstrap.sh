@@ -14,7 +14,6 @@ BUILD_ARCH="${BUILD_ARCH:-armhf}"
 GIT_HASH="${GIT_HASH:-"main"}"
 
 ## Debian base
-DEBIAN_VARIANT="Debian GNU/Linux"
 DEBIAN_VERSION="${DEBIAN_VERSION:-"12"}"
 DEBIAN_RELEASE="${DEBIAN_RELEASE:-"bookworm"}"
 
@@ -93,14 +92,12 @@ configure_rootfs () {
     # Finish bootstrapping & configuring in chroot
     chroot "${ROOTFS_DIR}" \
         /usr/bin/env \
-        BUILD_ARCH="${BUILD_ARCH}" \
-        DEBIAN_RELEASE="${DEBIAN_RELEASE}" \
-        DEBIAN_VARIANT="${DEBIAN_VARIANT}" \
-        DEBIAN_VERSION="${DEBIAN_VERSION}" \
         OS_NAME="${OS_NAME}" \
         OS_VERSION="${OS_VERSION}" \
-	    OS_REPO="${OS_REPO}" \
+        OS_REPO="${OS_REPO}" \
         GIT_HASH="${GIT_HASH}" \
+        BUILD_ARCH="${BUILD_ARCH}" \
+        DEBIAN_RELEASE="${DEBIAN_RELEASE}" \
         DEBOOTSTRAP_URL="${DEBOOTSTRAP_URL}" \
         /bin/bash < "${BUILD_DIR}/scripts/01-chroot.sh"
     chroot "${ROOTFS_DIR}" dpkg --get-selections | awk '{ print $1 }' > "${ROOTFS_PKGS}"
