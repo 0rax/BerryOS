@@ -74,6 +74,19 @@ fi
 apt-get update
 apt-get upgrade -y
 
+# Install initramfs-tools
+apt-get install -y \
+    --no-install-recommends \
+    initramfs-tools
+
+# Disable initramfs updates if any package installed after triggers them, initramfs will be regenenerated and updates reneabled later
+if [ -f /etc/initramfs-tools/update-initramfs.conf ]; then
+    sed -i 's/^update_initramfs=.*/update_initramfs=no/' /etc/initramfs-tools/update-initramfs.conf
+fi
+
+# Disable automatic kernel images symlinking
+echo "do_symlinks=0" > /etc/kernel-img.conf
+
 # Select correct kernel images for request build architecture
 KERNEL_IMAGES=
 case "${BUILD_ARCH}" in
@@ -85,13 +98,9 @@ case "${BUILD_ARCH}" in
     ;;
 esac
 
-# Disable kernel images symlinking
-echo "do_symlinks=0" > /etc/kernel-img.conf
-
-# Install firmwares, bootloader, tools and kernel
+# Install kernels, firmwares, bootloader and tools
 apt-get install -y \
     --no-install-recommends \
-    initramfs-tools \
     ${KERNEL_IMAGES} \
     firmware-atheros \
     firmware-brcm80211 \
@@ -101,11 +110,6 @@ apt-get install -y \
     raspi-firmware \
     raspi-config \
     raspberrypi-sys-mods
-
-# Disable initramfs updates if any package installed after triggers them, initramfs will be regenenerated and update reneabled in the last step here
-if [ -f /etc/initramfs-tools/update-initramfs.conf ]; then
-    sed -i 's/^update_initramfs=.*/update_initramfs=no/' /etc/initramfs-tools/update-initramfs.conf
-fi
 
 # Remove /etc/sudoers.d/010_pi-nopasswd installed by `raspberrypi-sys-mods`, user account creation and allowing them to assume root is handled by `clout-init`
 rm -f /etc/sudoers.d/010_pi-nopasswd
