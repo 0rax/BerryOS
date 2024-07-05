@@ -74,16 +74,6 @@ fi
 apt-get update
 apt-get upgrade -y
 
-# Install initramfs-tools
-apt-get install -y \
-    --no-install-recommends \
-    initramfs-tools
-
-# Disable initramfs updates if any package installed after triggers them, initramfs will be regenenerated and updates reneabled later
-if [ -f /etc/initramfs-tools/update-initramfs.conf ]; then
-    sed -i 's/^update_initramfs=.*/update_initramfs=no/' /etc/initramfs-tools/update-initramfs.conf
-fi
-
 # Disable automatic kernel images symlinking
 echo "do_symlinks=0" > /etc/kernel-img.conf
 
@@ -101,6 +91,7 @@ esac
 # Install kernels, firmwares, bootloader and tools
 apt-get install -y \
     --no-install-recommends \
+    initramfs-tools \
     ${KERNEL_IMAGES} \
     firmware-atheros \
     firmware-brcm80211 \
@@ -189,14 +180,6 @@ systemctl daemon-reload
 # Enable fake-hwclock and store current time
 systemctl enable fake-hwclock
 fake-hwclock save
-
-## Generate initramfs
-
-# Reneable initramfs updates
-sed -i 's/^update_initramfs=.*/update_initramfs=all/' /etc/initramfs-tools/update-initramfs.conf
-
-# Regenerate all initramfs
-update-initramfs -k all -c
 
 ## Cleanup
 apt-get clean
