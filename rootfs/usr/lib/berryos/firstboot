@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # This file is a tripped down version of https://github.com/RPi-Distro/raspberrypi-sys-mods/blob/b8daae4272db5621ff2c8b2cb8f116711a7bfee4/usr/lib/raspberrypi-sys-mods/firstboot with some minor tweaks to fit the goals of BerryOS.
 #
@@ -8,7 +8,7 @@
 #
 
 reboot_pi () {
-  umount "$FWLOC"
+  umount "${FWLOC}"
   mount / -o remount,ro
   sync
   reboot -f "$BOOT_PART_NUM"
@@ -18,12 +18,12 @@ reboot_pi () {
 
 get_variables () {
   ROOT_PART_DEV=$(findmnt / -no source)
-  ROOT_DEV_NAME=$(lsblk -no pkname  "$ROOT_PART_DEV")
+  ROOT_DEV_NAME=$(lsblk -no pkname  "${ROOT_PART_DEV}")
   ROOT_DEV="/dev/${ROOT_DEV_NAME}"
 
-  BOOT_PART_DEV=$(findmnt "$FWLOC" -no source)
-  BOOT_PART_NAME=$(lsblk -no kname "$BOOT_PART_DEV")
-  BOOT_DEV_NAME=$(lsblk -no pkname  "$BOOT_PART_DEV")
+  BOOT_PART_DEV=$(findmnt "${FWLOC}" -no source)
+  BOOT_PART_NAME=$(lsblk -no kname "${BOOT_PART_DEV}")
+  BOOT_DEV_NAME=$(lsblk -no pkname  "${BOOT_PART_DEV}")
   BOOT_PART_NUM=$(cat "/sys/block/${BOOT_DEV_NAME}/${BOOT_PART_NAME}/partition")
 
   OLD_DISKID=$(fdisk -l "$ROOT_DEV" | sed -n 's/Disk identifier: 0x\([^ ]*\)/\1/p')
@@ -33,8 +33,8 @@ fix_partuuid() {
   if [ "$BOOT_PART_NUM" != "1" ]; then
     return 0
   fi
-  mount -o remount,rw "$ROOT_PART_DEV"
-  mount -o remount,rw "$BOOT_PART_DEV"
+  mount -o remount,rw "${ROOT_PART_DEV}"
+  mount -o remount,rw "${BOOT_PART_DEV}"
   DISKID="$(dd if=/dev/hwrng bs=4 count=1 status=none | od -An -tx4 | cut -c2-9)"
   fdisk "$ROOT_DEV" > /dev/null <<EOF
 x
@@ -45,12 +45,12 @@ w
 EOF
   if [ "$?" -eq 0 ]; then
     sed -i "s/${OLD_DISKID}/${DISKID}/g" /etc/fstab
-    sed -i "s/${OLD_DISKID}/${DISKID}/" "$FWLOC/cmdline.txt"
+    sed -i "s/${OLD_DISKID}/${DISKID}/" "${FWLOC}/cmdline.txt"
     sync
   fi
 
-  mount -o remount,ro "$ROOT_PART_DEV"
-  mount -o remount,ro "$BOOT_PART_DEV"
+  mount -o remount,ro "${ROOT_PART_DEV}"
+  mount -o remount,ro "${BOOT_PART_DEV}"
 }
 
 main () {
@@ -74,15 +74,15 @@ if ! FWLOC=$(/usr/lib/raspberrypi-sys-mods/get_fw_loc); then
   poweroff -f
 fi
 
-mount "$FWLOC" -o rw
+mount "${FWLOC}" -o rw
 
-sed -i 's| init=/usr/lib/berryos/firstboot||' "$FWLOC/cmdline.txt"
-sed -i 's| sdhci\.debug_quirks2=4||' "$FWLOC/cmdline.txt"
+sed -i 's| init=/usr/lib/berryos/firstboot||' "${FWLOC}/cmdline.txt"
+sed -i 's| sdhci\.debug_quirks2=4||' "${FWLOC}/cmdline.txt"
 
-if ! grep -q splash "$FWLOC/cmdline.txt"; then
-  sed -i "s/ quiet//g" "$FWLOC/cmdline.txt"
+if ! grep -q splash "${FWLOC}/cmdline.txt"; then
+  sed -i "s/ quiet//g" "${FWLOC}/cmdline.txt"
 fi
-mount "$FWLOC" -o remount,ro
+mount "${FWLOC}" -o remount,ro
 sync
 
 main

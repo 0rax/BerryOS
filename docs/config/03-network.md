@@ -20,7 +20,7 @@ permalink: /docs/config/network/
 
 ## Introduction
 
-Network configuration in BerryOS is handle by [`cloud-init`](https://cloudinit.readthedocs.io/en/latest/topics/network-config.html) with the help of [`netplan`](https://netplan.io/) inside the [`/boot/network-config`](https://github.com/0rax/BerryOS/blob/main/rootfs/boot/network-config) file.
+Network configuration in BerryOS is handle by [`cloud-init`](https://cloudinit.readthedocs.io/en/latest/topics/network-config.html) with the help of [`netplan`](https://netplan.io/) inside the [`/boot/firmware/network-config`](https://github.com/0rax/BerryOS/blob/main/rootfs/boot/firmware/network-config) file.
 
 We decided to use the [version 2 networking config format](https://cloudinit.readthedocs.io/en/latest/topics/network-config-format-v2.html) as it is capable of configuring both the `eth0` and `wlan0` interface on the Raspberry Pi easily thanks to `netplan`'s ability to configure `systemd-networkd` renderer.
 

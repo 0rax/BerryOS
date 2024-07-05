@@ -25,6 +25,9 @@ OUTPUT_DIR="${BUILD_DIR}/out"
 ROOTFS_TAR="${OUTPUT_DIR}/${OS_NAME,,}-${BUILD_ARCH}-${DEBIAN_RELEASE}-${OS_VERSION//.}-rootfs.tar.xz"
 ROOTFS_PKGS="${OUTPUT_DIR}/${OS_NAME,,}-${BUILD_ARCH}-${DEBIAN_RELEASE}-${OS_VERSION//.}-packages.txt"
 
+## Build cache
+DEBOOTSTRAP_CACHE_DIR="/tmp/debootstrap.cache"
+
 ## Debootstrap config
 DEFAULT_PACKAGES_INCLUDE="apt-transport-https,binutils,busybox,ca-certificates,gpg,gpgv,gpg-agent,locales,net-tools,wireless-tools,rfkill,wpasupplicant,openssh-server,sudo,usbutils,wget,dbus,libpam-systemd,systemd-timesyncd,resolvconf,lsb-release,gettext,zstd"
 DEFAULT_PACKAGES_EXCLUDE="debfoster,ntp,info,man-db,paxctld,groff-base,install-info,traceroute,netcat-openbsd"
@@ -86,10 +89,14 @@ bootstrap_rootfs () {
     chmod 0755 "${ROOTFS_DIR}"
     export ROOTFS_DIR
 
+    # Make sure cache dir exists
+    mkdir -p "${DEBOOTSTRAP_CACHE_DIR}"
+
     # Bootstrap system
     mkdir -p "${ROOTFS_DIR}"
-    debootstrap \
+    eatmydata -- debootstrap \
         "${DEBOOTSTRAP_KEYRING_OPTION}" \
+        --cache-dir="${DEBOOTSTRAP_CACHE_DIR}" \
         --arch="${BUILD_ARCH}" \
         --include="${DEFAULT_PACKAGES_INCLUDE}" \
         --exclude="${DEFAULT_PACKAGES_EXCLUDE}" \

@@ -57,7 +57,7 @@ In the end, BerryOS is just a stripped down version of [Raspberry Pi OS Lite (St
 
 ### Default environment
 
-If not configured using `/boot/user-data`, BerryOS will be provisioned using its default configuration, this default environment will include the default user accessible via:
+If not configured using `/boot/firmware/user-data`, BerryOS will be provisioned using its default configuration, this default environment will include the default user accessible via:
 
 - Username: `pi`
 - Password: `raspberry`
@@ -94,7 +94,7 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 ### `BerryOS/armhf`
 
-| Stat                   | BerryOS Bookworm (2024.07.04) | RaspiOS Lite Bookworm (2024-03-12) |
+| Stat                   | BerryOS Bookworm (2024.07.05) | RaspiOS Lite Bookworm (2024-03-12) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
 | RAM usage              | 94M                           | 106M                               |
 | Running processes      | 10                            | 16                                 |
@@ -105,7 +105,7 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 ### `BerryOS/arm64`
 
-| Stat                   | BerryOS Bookworm (2024.07.04) | RaspiOS Lite Bookworm (2024-03-12) |
+| Stat                   | BerryOS Bookworm (2024.07.05) | RaspiOS Lite Bookworm (2024-03-12) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
 | RAM usage              | 118M                          | 126M                               |
 | Running processes      | 10                            | 16                                 |
