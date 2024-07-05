@@ -57,7 +57,7 @@ In the end, BerryOS is just a stripped down version of [Raspberry Pi OS Lite (St
 
 ### Default environment
 
-If not configured using `/boot/user-data`, BerryOS will be provisioned using its default configuration, this default environment will include the default user accessible via:
+If not configured using `/boot/firmware/user-data`, BerryOS will be provisioned using its default configuration, this default environment will include the default user accessible via:
 
 - Username: `pi`
 - Password: `raspberry`

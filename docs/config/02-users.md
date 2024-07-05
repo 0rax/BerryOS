@@ -20,7 +20,7 @@ permalink: /docs/config/users/
 
 ## Introduction
 
-BerryOS comes by default with a single accessible user created on first boot by [`cloud-init`](https://cloud-init.io/). This default user can be configured or overwritten quite easily in your [`/boot/user-data`](https://github.com/0rax/BerryOS/blob/main/rootfs/boot/user-data) file.
+BerryOS comes by default with a single accessible user created on first boot by [`cloud-init`](https://cloud-init.io/). This default user can be configured or overwritten quite easily in your [`/boot/firmware/user-data`](https://github.com/0rax/BerryOS/blob/main/rootfs/boot/firmware/user-data) file.
 
 ## Default User
 

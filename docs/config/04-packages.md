@@ -21,7 +21,7 @@ lastmod: 2022-06-11T16:59:07.081Z
 
 ## Introduction
 
-During first boot, [`cloud-init`](https://cloud-init.io/) can be asked to manage enabled repositories, installed packages or even upgrade your system using the [Package module](https://cloudinit.readthedocs.io/en/latest/topics/modules.html#package-update-upgrade-install) in your [`/boot/user-data`](https://github.com/0rax/BerryOS/blob/main/rootfs/boot/user-data) file.
+During first boot, [`cloud-init`](https://cloud-init.io/) can be asked to manage enabled repositories, installed packages or even upgrade your system using the [Package module](https://cloudinit.readthedocs.io/en/latest/topics/modules.html#package-update-upgrade-install) in your [`/boot/firmware/user-data`](https://github.com/0rax/BerryOS/blob/main/rootfs/boot/firmware/user-data) file.
 
 ## Installing packages
 

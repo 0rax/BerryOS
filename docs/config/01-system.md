@@ -22,7 +22,7 @@ permalink: /docs/config/system/
 
 The main goal of using [`cloud-init`](https://cloud-init.io/) in BerryOS is to be able to easily configure your system during its first startup. It provides quite a lot of possibilities out of the box that we will explore here.
 
-Most of the example shown here are related to your [`/boot/user-data`](https://github.com/0rax/BerryOS/blob/main/rootfs/boot/user-data) file unless stated otherwise. This file is the main way you interact with `cloud-init`.
+Most of the example shown here are related to your [`/boot/firmware/user-data`](https://github.com/0rax/BerryOS/blob/main/rootfs/boot/firmware/user-data) file unless stated otherwise. This file is the main way you interact with `cloud-init`.
 
 ## Configuring hostname
 
