@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # This file is a tripped down version of https://github.com/RPi-Distro/raspberrypi-sys-mods/blob/b8daae4272db5621ff2c8b2cb8f116711a7bfee4/usr/lib/raspberrypi-sys-mods/firstboot with some minor tweaks to fit the goals of BerryOS.
 #
