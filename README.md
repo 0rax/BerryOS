@@ -22,6 +22,7 @@ BerryOS is available in two variant, a 32-bit version called `BerryOS/armhf` and
   - Raspberry Compute Module 3 +
   - Raspberry Compute Module 4
   - Raspberry Pi Zero 2 W
+  - Raspberry Pi 5
 
 Each release is tested on the following hardware:
 
@@ -43,7 +44,8 @@ To do so, BerryOS is bootstrapped from the same base as Raspberry Pi OS Lite wit
 - Serial console disabled by default
 - Bluetooth support not configured by default
 - No swapfile configured by default
-- `wpa_supplicant` installed and configured by disabled by default
+- `wpa_supplicant` installed and configured but disabled by default
+- Support for `/boot/config.toml` removed in favor of `cloud-init` (see [#5](https://github.com/0rax/BerryOS/pull/5) and [#15](https://github.com/0rax/BerryOS/pull/15))
 
 On the other hand, some services have been kept as is from Raspberry Pi such as:
 
@@ -81,10 +83,10 @@ A more detailed explanation of most of what can be configured using `cloud-init`
 
 ## Benchmark
 
-Benchmarked on a Raspberry Pi 3 B connected via Ethernet using DHCP with the following commands after first-boot:
+Benchmarked on a Raspberry Pi 3 B+ connected to internet via Ethernet using DHCP running the following commands after first-boot:
 
 - RAM usage: `free -th | mawk '/^Total:/{print $3}'`
-- Running processes: `pstree -Ta` (removing `sshd` & `systemctl --user` session)
+- Running processes: `pstree -Ta` (removing the current user session, i.e: `login -p` & `systemctl --user` processes)
 - Disk usage: `findmnt -no USED /`
 - Pre-installed packages: `dpkg --get-selections | wc -l`
 
@@ -92,30 +94,30 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 ### `BerryOS/armhf`
 
-| Stat                   | BerryOS Bullseye (2022.06.11) | RaspiOS Lite Bullseye (2022.04.04) |
+| Stat                   | BerryOS Bookworm (2024.07.04) | RaspiOS Lite Bookworm (2024-03-12) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
-| RAM usage              | 37M                           | 57M                                |
-| Running processes      | 12                            | 18                                 |
-| Disk usage             | 787M                          | 1.3G                               |
-| Pre-installed packages | 309                           | 530                                |
-| Download size          | 200M                          | 297M                               |
-| Image size             | 1312M                         | 1924M                              |
+| RAM usage              | 94M                           | 106M                               |
+| Running processes      | 10                            | 16                                 |
+| Disk usage             | 898M                          | 1.6G                               |
+| Pre-installed packages | 333                           | 601                                |
+| Download size          | 353M                          | 475M                               |
+| Image size             | 1340M                         | 2424M                              |
 
 ### `BerryOS/arm64`
 
-| Stat                   | BerryOS Bullseye (2022.06.11) | RaspiOS Lite Bullseye (2022.04.04) |
+| Stat                   | BerryOS Bookworm (2024.07.04) | RaspiOS Lite Bookworm (2024-03-12) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
-| RAM usage              | 52M                           | 72M                                |
-| Running processes      | 12                            | 20                                 |
-| Disk usage             | 614M                          | 1.3G                               |
-| Pre-installed packages | 288                           | 521                                |
-| Download size          | 154M                          | 271M                               |
-| Image size             | 1116M                         | 1908M                              |
+| RAM usage              | 118M                          | 126M                               |
+| Running processes      | 10                            | 16                                 |
+| Disk usage             | 852M                          | 1.7G                               |
+| Pre-installed packages | 310                           | 588                                |
+| Download size          | 277M                          | 415M                               |
+| Image size             | 1356M                         | 2640M                              |
 
 ## Acknowledgements
 
 This project has been heavily inspired by the work previously done by the team at [Hypriot](https://github.com/hypriot) for their HypriotOS. It was the starting point of this project and this project wouldn't exist without it.
 
-The [RPi-Distro/pi-gen](https://github.com/RPi-Distro/pi-gen) & [RPi-Distro/raspi-config](https://github.com/RPi-Distro/raspi-config) projects have also been very helpful when tackling some hardware specific issues and optimizing image creation.
+The [RPi-Distro/pi-gen](https://github.com/RPi-Distro/pi-gen), [RPi-Distro/raspi-config](https://github.com/RPi-Distro/raspi-config) & [RPi-Distro/raspberrypi-sys-mods](https://github.com/RPi-Distro/raspberrypi-sys-mods/) projects have also been very helpful when tackling some hardware specific issues and optimizing image creation.
 
 To the team responsible for those great pieces of software, thank you !

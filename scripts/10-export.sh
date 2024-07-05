@@ -10,7 +10,7 @@ fi
 OS_NAME="${OS_NAME:-"BerryOS"}"
 OS_VERSION="${OS_VERSION?}"
 BUILD_ARCH="${BUILD_ARCH?}"
-DEBIAN_RELEASE="${DEBIAN_RELEASE:-"bullseye"}"
+DEBIAN_RELEASE="${DEBIAN_RELEASE:-"bookworm"}"
 
 ## Build path
 BUILD_DIR="${BUILD_DIR:-/opt/bootstrap}"
@@ -68,23 +68,23 @@ mount_image () {
     sleep 3
 
     # Create file systems
-    mkfs.vfat "${BOOT_DEV}" -n "boot"
+    mkfs.vfat "${BOOT_DEV}" -n "bootfs"
     mkfs.ext4 "${ROOT_DEV}" -L "rootfs" -F -i 4096 # create 1 inode per 4kByte block (maximum ratio is 1 per 1kByte)
 
     # Mount file systems
     mount -v "${ROOT_DEV}" "/mnt" -t ext4
-    mkdir -p "/mnt/boot"
-    mount -v "${BOOT_DEV}" "/mnt/boot" -t vfat
+    mkdir -p "/mnt/boot/firmware"
+    mount -v "${BOOT_DEV}" "/mnt/boot/firmware" -t vfat
 }
 
 patch_rootfs () {
     # Create mount points
     mkdir -p "${ROOTFS_DIR}"/{proc,sys,dev/pts}
 
-    # Inject PARTUUID in /etc/fstab & /boot/cmdline.txt
+    # Inject PARTUUID in /etc/fstab & /boot/firmware/cmdline.txt
     sed -i "s/BOOTDEV/PARTUUID=${BOOT_PARTUUID}/" "${ROOTFS_DIR}/etc/fstab"
     sed -i "s/ROOTDEV/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/etc/fstab"
-    sed -i "s/ROOTDEV/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/boot/cmdline.txt"
+    sed -i "s/ROOTDEV/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/boot/firmware/cmdline.txt"
 
     # Reset machine-id
     rm -f "${ROOTFS_DIR}/var/lib/dbus/machine-id"
@@ -96,13 +96,13 @@ patch_rootfs () {
 
 sync_rootfs () {
     # Copy rootfs content to mounted file systems
-    rsync -aHAXx --exclude /var/cache/apt/archives --exclude /boot "${ROOTFS_DIR}/" "/mnt"
-    rsync -rtx "${ROOTFS_DIR}/boot/" "/mnt/boot/"
+    rsync -aHAXx --exclude /var/cache/apt/archives --exclude /boot/firmware "${ROOTFS_DIR}/" "/mnt"
+    rsync -rtx "${ROOTFS_DIR}/boot/firmware/" "/mnt/boot/firmware/"
 }
 
 umount_image () {
     # Unmount filesystems
-    umount /mnt/boot
+    umount /mnt/boot/firmware
     umount /mnt
 
     # Zero unallocated blocks using zerofree to enhance compression

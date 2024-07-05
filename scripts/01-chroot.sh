@@ -9,13 +9,11 @@ fi
 ## Build config
 OS_NAME="${OS_NAME?}"
 OS_VERSION="${OS_VERSION?}"
-OS_PREFIX="${OS_PREFIX:-${OS_NAME^^}}"
 BUILD_ARCH="${BUILD_ARCH:-$(dpkg --print-architecture)}"
 
 ## Debian base
 DEBIAN_VARIANT="${DEBIAN_VARIANT?}"
 DEBIAN_RELEASE="${DEBIAN_RELEASE?}"
-DEBIAN_VERSION="${DEBIAN_VERSION?}"
 DEBOOTSTRAP_URL="${DEBOOTSTRAP_URL?}"
 
 ## System config
@@ -32,15 +30,23 @@ echo "${DEFAULT_HOSTNAME}" > /etc/hostname
 echo "127.0.1.1       ${DEFAULT_HOSTNAME}" >> /etc/hosts
 
 # Update source.list to include extra pools
-DEBIAN_POOLS="main contrib non-free"
 if [ "${DEBIAN_VARIANT}" == "Raspbian GNU/Linux" ]; then
-    DEBIAN_POOLS="${DEBIAN_POOLS} rpi"
+    DEBIAN_POOLS="main contrib non-free rpi"
+    (
+        echo "deb ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}"
+        echo "# Uncomment line below then 'apt-get update' to enable 'apt-get source'"
+        echo "#deb-src ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}"
+    ) | tee /etc/apt/sources.list
+else
+    DEBIAN_POOLS="main contrib non-free non-free-firmware"
+    (
+        echo "deb ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}"
+        echo "deb ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}"
+        echo "# Uncomment line below then 'apt-get update' to enable 'apt-get source'"
+        echo "#deb-src ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}"
+        echo "#deb-src ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}"
+    ) | tee /etc/apt/sources.list
 fi
-(
-    echo "deb ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}"
-    echo "# Uncomment line below then 'apt-get update' to enable 'apt-get source'"
-    echo "#deb-src ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}"
-) | tee /etc/apt/sources.list
 
 # Set default systemd target to multi-user
 systemctl set-default multi-user.target
@@ -48,70 +54,80 @@ systemctl set-default multi-user.target
 ## Install Raspberry Pi dependencies
 
 # Add Raspberry Pi official repository
-RPI_GPG_KEY_URL=http://archive.raspberrypi.org/debian/raspberrypi.gpg.key
+RPI_GPG_KEY_URL=http://archive.raspberrypi.com/debian/raspberrypi.gpg.key
 RPI_GPG_KEYRING=/etc/apt/trusted.gpg.d/raspberrypi-archive.gpg
 wget -qO- "${RPI_GPG_KEY_URL}" | gpg --dearmor > "${RPI_GPG_KEYRING}"
 (
-    echo "deb http://archive.raspberrypi.org/debian/ ${DEBIAN_RELEASE} main"
+    echo "deb http://archive.raspberrypi.com/debian/ ${DEBIAN_RELEASE} main"
     echo "# Uncomment line below then 'apt-get update' to enable 'apt-get source'"
-    echo "#deb-src http://archive.raspberrypi.org/debian/ ${DEBIAN_RELEASE} main"
+    echo "#deb-src http://archive.raspberrypi.com/debian/ ${DEBIAN_RELEASE} main"
 ) | tee /etc/apt/sources.list.d/raspberrypi.list
 
-# Pin specific dependency to the raspberrypi repository
-mkdir -p "/etc/apt/preferences.d"
-tee /etc/apt/preferences.d/raspberrypi << EOF
-# Ensure that the correct firmware packages from the Raspberry Pi Foundation get installed
-
-Package: firmware-*
-Pin: origin archive.raspberrypi.org
-Pin-Priority: 1001
-
-Package: libraspberrypi*
-Pin: origin archive.raspberrypi.org
-Pin-Priority: 1001
-
-Package: raspberrypi-bootloader
-Pin: origin archive.raspberrypi.org
-Pin-Priority: 1001
-EOF
+# Enable the other architecture in dpkg (required for various reason)
+if [ "${BUILD_ARCH}" = "armhf" ]; then
+    dpkg --add-architecture arm64
+elif [ "${BUILD_ARCH}" = "arm64" ]; then
+    dpkg --add-architecture armhf
+fi
 
 # Update lists and upgrade existing package to their RPi specific counterpart
 apt-get update
 apt-get upgrade -y
 
+# Select correct kernel images for request build architecture
+KERNEL_IMAGES=
+case "${BUILD_ARCH}" in
+    armhf)
+        KERNEL_IMAGES="linux-image-rpi-v6 linux-image-rpi-v7 linux-image-rpi-v7l linux-image-rpi-v8"
+    ;;
+    arm64)
+        KERNEL_IMAGES="linux-image-rpi-v8 linux-image-rpi-2712"
+    ;;
+esac
+
+# Disable kernel images symlinking
+echo "do_symlinks=0" > /etc/kernel-img.conf
+
 # Install firmwares, bootloader, tools and kernel
 apt-get install -y \
     --no-install-recommends \
-    raspberrypi-bootloader \
-    raspberrypi-kernel \
+    initramfs-tools \
+    ${KERNEL_IMAGES} \
     firmware-atheros \
     firmware-brcm80211 \
     firmware-libertas \
     firmware-misc-nonfree \
     firmware-realtek \
-    libraspberrypi0 \
-    libraspberrypi-bin \
-    raspi-config
+    raspi-firmware \
+    raspi-config \
+    raspberrypi-sys-mods
+
+# Disable initramfs updates if any package installed after triggers them, initramfs will be regenenerated and update reneabled in the last step here
+if [ -f /etc/initramfs-tools/update-initramfs.conf ]; then
+    sed -i 's/^update_initramfs=.*/update_initramfs=no/' /etc/initramfs-tools/update-initramfs.conf
+fi
+
+# Remove /etc/sudoers.d/010_pi-nopasswd installed by `raspberrypi-sys-mods`, user account creation and allowing them to assume root is handled by `clout-init`
+rm -f /etc/sudoers.d/010_pi-nopasswd
 
 ## Setup OS specifics
 
-# Setup OS issues
-tee /etc/issue << EOF
-${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_VARIANT} ${DEBIAN_VERSION}) \n \l
-
-eth0 : \4{eth0}
-wlan0: \4{wlan0}
-
-EOF
-tee /etc/issue.net << EOF
-echo "${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_VARIANT} ${DEBIAN_VERSION})"
+# Setup rpi-issue
+tee /etc/rpi-issue << EOF
+${OS_NAME} ${OS_VERSION}
+Generated using berryos-builder, ${OS_REPO}, ${GIT_HASH}, ${BUILD_ARCH}
 EOF
 
+install -m 644 /etc/rpi-issue /boot/firmware/issue.txt
+if ! [ -L /boot/issue.txt ]; then
+	ln -s firmware/issue.txt /boot/issue.txt
+fi
 
 # Setup MOTD
+DEBIAN_ISSUE=$(cat /etc/issue.net)
 tee /etc/motd << EOF
 
-${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_VARIANT} ${DEBIAN_VERSION})
+${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_ISSUE})
 
 The programs included with the Debian GNU/Linux system are free software;
 the exact distribution terms for each program are described in the
@@ -120,10 +136,6 @@ individual files in /usr/share/doc/*/copyright.
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
 EOF
-
-# Add extra /etc/os-release parameters
-printf '%s_NAME="%s/%s"\n' "${OS_PREFIX}" "${OS_NAME}" "${BUILD_ARCH}" >> /etc/os-release
-printf '%s_VERSION="%s"\n' "${OS_PREFIX}" "${OS_VERSION}" >> /etc/os-release
 
 ## Install & configure cloud-init
 
@@ -173,6 +185,14 @@ systemctl daemon-reload
 # Enable fake-hwclock and store current time
 systemctl enable fake-hwclock
 fake-hwclock save
+
+## Generate initramfs
+
+# Reneable initramfs updates
+sed -i 's/^update_initramfs=.*/update_initramfs=all/' /etc/initramfs-tools/update-initramfs.conf
+
+# Regenerate all initramfs
+update-initramfs -k all -c
 
 ## Cleanup
 apt-get clean
