@@ -83,10 +83,10 @@ A more detailed explanation of most of what can be configured using `cloud-init`
 
 ## Benchmark
 
-Benchmarked on a Raspberry Pi 3 B+ connected via Ethernet using DHCP running the following commands over ssh after first-boot:
+Benchmarked on a Raspberry Pi 3 B+ connected to internet via Ethernet using DHCP running the following commands after first-boot:
 
 - RAM usage: `free -th | mawk '/^Total:/{print $3}'`
-- Running processes: `pstree -Ta` (removing `sshd` & `systemctl --user` session)
+- Running processes: `pstree -Ta` (removing the current user session, i.e: `login -p` & `systemctl --user` processes)
 - Disk usage: `findmnt -no USED /`
 - Pre-installed packages: `dpkg --get-selections | wc -l`
 
@@ -96,22 +96,22 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 | Stat                   | BerryOS Bookworm (2024.07.04) | RaspiOS Lite Bookworm (2024-03-12) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
-| RAM usage              | 37M                           | 106M                               |
-| Running processes      | 12                            | 16                                 |
-| Disk usage             | 787M                          | 1.6G                               |
-| Pre-installed packages | 308                           | 601                                |
-| Download size          | 301M                          | 475M                               |
-| Image size             | 1260M                         | 2424M                              |
+| RAM usage              | 94M                           | 106M                               |
+| Running processes      | 10                            | 16                                 |
+| Disk usage             | 898M                          | 1.6G                               |
+| Pre-installed packages | 333                           | 601                                |
+| Download size          | 353M                          | 475M                               |
+| Image size             | 1340M                         | 2424M                              |
 
 ### `BerryOS/arm64`
 
 | Stat                   | BerryOS Bookworm (2024.07.04) | RaspiOS Lite Bookworm (2024-03-12) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
-| RAM usage              | 52M                           | 124M                               |
-| Running processes      | 12                            | 16                                 |
-| Disk usage             | 614M                          | 1.7G                               |
-| Pre-installed packages | 306                           | 588                                |
-| Download size          | 273M                          | 415M                               |
+| RAM usage              | 118M                          | 126M                               |
+| Running processes      | 10                            | 16                                 |
+| Disk usage             | 852M                          | 1.7G                               |
+| Pre-installed packages | 310                           | 588                                |
+| Download size          | 277M                          | 415M                               |
 | Image size             | 1356M                         | 2640M                              |
 
 ## Acknowledgements

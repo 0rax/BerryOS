@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This file is based on https://github.com/RPi-Distro/raspberrypi-sys-mods/blob/b8daae4272db5621ff2c8b2cb8f116711a7bfee4/usr/lib/raspberrypi-sys-mods/firstboot with some minor tweaks to fit the goals of BerryOS.
+# This file is a tripped down version of https://github.com/RPi-Distro/raspberrypi-sys-mods/blob/b8daae4272db5621ff2c8b2cb8f116711a7bfee4/usr/lib/raspberrypi-sys-mods/firstboot with some minor tweaks to fit the goals of BerryOS.
 #
 # The main changes made here are:
 #   - removed support for `/boot/firmware/config.toml` and `/boot/firmware/firstrun.sh`
@@ -76,7 +76,7 @@ fi
 
 mount "$FWLOC" -o rw
 
-sed -i 's| init=/usr/lib/raspberrypi-sys-mods/firstboot||' "$FWLOC/cmdline.txt"
+sed -i 's| init=/usr/lib/berryos/firstboot||' "$FWLOC/cmdline.txt"
 sed -i 's| sdhci\.debug_quirks2=4||' "$FWLOC/cmdline.txt"
 
 if ! grep -q splash "$FWLOC/cmdline.txt"; then

@@ -14,6 +14,7 @@ BUILD_ARCH="${BUILD_ARCH:-armhf}"
 GIT_HASH="${GIT_HASH:-"main"}"
 
 ## Debian base
+DEBIAN_VARIANT="Debian GNU/Linux"
 DEBIAN_VERSION="${DEBIAN_VERSION:-"12"}"
 DEBIAN_RELEASE="${DEBIAN_RELEASE:-"bookworm"}"
 
@@ -25,7 +26,7 @@ ROOTFS_TAR="${OUTPUT_DIR}/${OS_NAME,,}-${BUILD_ARCH}-${DEBIAN_RELEASE}-${OS_VERS
 ROOTFS_PKGS="${OUTPUT_DIR}/${OS_NAME,,}-${BUILD_ARCH}-${DEBIAN_RELEASE}-${OS_VERSION//.}-packages.txt"
 
 ## Debootstrap config
-DEFAULT_PACKAGES_INCLUDE="apt-transport-https,binutils,ca-certificates,gpg,gpgv,gpg-agent,locales,net-tools,wireless-tools,rfkill,wpasupplicant,openssh-server,sudo,usbutils,wget,dbus,libpam-systemd,systemd-timesyncd,resolvconf,lsb-release,gettext,zstd"
+DEFAULT_PACKAGES_INCLUDE="apt-transport-https,binutils,busybox,ca-certificates,gpg,gpgv,gpg-agent,locales,net-tools,wireless-tools,rfkill,wpasupplicant,openssh-server,sudo,usbutils,wget,dbus,libpam-systemd,systemd-timesyncd,resolvconf,lsb-release,gettext,zstd"
 DEFAULT_PACKAGES_EXCLUDE="debfoster,ntp,info,man-db,paxctld,groff-base,install-info,traceroute,netcat-openbsd"
 
 setup_debootstrap () {
@@ -33,6 +34,22 @@ setup_debootstrap () {
     DEBOOTSTRAP_URL="http://deb.debian.org/debian"
     GPG_KEYRING="/usr/share/keyrings/debian-${DEBIAN_RELEASE}-archive-keyring.gpg"
     GPG_KEY_URL="https://ftp-master.debian.org/keys/archive-key-${DEBIAN_VERSION}.asc"
+
+    # Verify BUILD_ARCH is supported and use Raspbian when armhf
+    case "${BUILD_ARCH}" in
+        armhf)
+            DEBIAN_VARIANT="Raspbian GNU/Linux"
+            DEBOOTSTRAP_URL="http://raspbian.raspberrypi.org/raspbian/"
+            GPG_KEY_URL="http://raspbian.raspberrypi.org/raspbian.public.key"
+            GPG_KEYRING="/usr/share/keyrings/raspbian-archive-keyring.gpg"
+        ;;
+        arm64)
+        ;;
+        *)
+            echo "Unsupported BUILD_ARCH (${BUILD_ARCH})" 1>&2
+            exit 1
+        ;;
+    esac
 
     # Fetch and configure keyring if needed
     DEBOOTSTRAP_KEYRING_OPTION=""
@@ -97,6 +114,7 @@ configure_rootfs () {
         OS_REPO="${OS_REPO}" \
         GIT_HASH="${GIT_HASH}" \
         BUILD_ARCH="${BUILD_ARCH}" \
+        DEBIAN_VARIANT="${DEBIAN_VARIANT}" \
         DEBIAN_RELEASE="${DEBIAN_RELEASE}" \
         DEBOOTSTRAP_URL="${DEBOOTSTRAP_URL}" \
         /bin/bash < "${BUILD_DIR}/scripts/01-chroot.sh"

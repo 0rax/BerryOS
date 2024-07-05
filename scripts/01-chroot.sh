@@ -12,6 +12,7 @@ OS_VERSION="${OS_VERSION?}"
 BUILD_ARCH="${BUILD_ARCH:-$(dpkg --print-architecture)}"
 
 ## Debian base
+DEBIAN_VARIANT="${DEBIAN_VARIANT?}"
 DEBIAN_RELEASE="${DEBIAN_RELEASE?}"
 DEBOOTSTRAP_URL="${DEBOOTSTRAP_URL?}"
 
@@ -29,14 +30,23 @@ echo "${DEFAULT_HOSTNAME}" > /etc/hostname
 echo "127.0.1.1       ${DEFAULT_HOSTNAME}" >> /etc/hosts
 
 # Update source.list to include extra pools
-DEBIAN_POOLS="main contrib non-free non-free-firmware"
-tee /etc/apt/sources.list << EOF
-deb ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}
-deb ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}
-# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-#deb-src ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}
-#deb-src ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}
-EOF
+if [ "${DEBIAN_VARIANT}" == "Raspbian GNU/Linux" ]; then
+    DEBIAN_POOLS="main contrib non-free rpi"
+    (
+        echo "deb ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}"
+        echo "# Uncomment line below then 'apt-get update' to enable 'apt-get source'"
+        echo "#deb-src ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}"
+    ) | tee /etc/apt/sources.list
+else
+    DEBIAN_POOLS="main contrib non-free non-free-firmware"
+    (
+        echo "deb ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}"
+        echo "deb ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}"
+        echo "# Uncomment line below then 'apt-get update' to enable 'apt-get source'"
+        echo "#deb-src ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}"
+        echo "#deb-src ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}"
+    ) | tee /etc/apt/sources.list
+fi
 
 # Set default systemd target to multi-user
 systemctl set-default multi-user.target
@@ -47,11 +57,18 @@ systemctl set-default multi-user.target
 RPI_GPG_KEY_URL=http://archive.raspberrypi.com/debian/raspberrypi.gpg.key
 RPI_GPG_KEYRING=/etc/apt/trusted.gpg.d/raspberrypi-archive.gpg
 wget -qO- "${RPI_GPG_KEY_URL}" | gpg --dearmor > "${RPI_GPG_KEYRING}"
-tee /etc/apt/sources.list.d/raspberrypi.list << EOF
-deb http://archive.raspberrypi.com/debian/ ${DEBIAN_RELEASE} main
-# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-#deb-src http://archive.raspberrypi.com/debian/ ${DEBIAN_RELEASE} main
-EOF
+(
+    echo "deb http://archive.raspberrypi.com/debian/ ${DEBIAN_RELEASE} main"
+    echo "# Uncomment line below then 'apt-get update' to enable 'apt-get source'"
+    echo "#deb-src http://archive.raspberrypi.com/debian/ ${DEBIAN_RELEASE} main"
+) | tee /etc/apt/sources.list.d/raspberrypi.list
+
+# Enable the other architecture in dpkg (required for various reason)
+if [ "${BUILD_ARCH}" = "armhf" ]; then
+    dpkg --add-architecture arm64
+elif [ "${BUILD_ARCH}" = "arm64" ]; then
+    dpkg --add-architecture armhf
+fi
 
 # Update lists and upgrade existing package to their RPi specific counterpart
 apt-get update
@@ -61,7 +78,7 @@ apt-get upgrade -y
 KERNEL_IMAGES=
 case "${BUILD_ARCH}" in
     armhf)
-        KERNEL_IMAGES="linux-image-rpi-v6 linux-image-rpi-v7 linux-image-rpi-v7l"
+        KERNEL_IMAGES="linux-image-rpi-v6 linux-image-rpi-v7 linux-image-rpi-v7l linux-image-rpi-v8"
     ;;
     arm64)
         KERNEL_IMAGES="linux-image-rpi-v8 linux-image-rpi-2712"
