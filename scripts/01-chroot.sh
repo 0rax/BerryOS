@@ -33,9 +33,9 @@ echo "127.0.1.1       ${DEFAULT_HOSTNAME}" >> /etc/hosts
 if [ "${DEBIAN_VARIANT}" == "Raspbian GNU/Linux" ]; then
     DEBIAN_POOLS="main contrib non-free rpi"
     (
-        echo "deb ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}"
+        echo "deb [arch=armhf] ${DEBOOTSTRAP_URL} ${DEBIAN_RELEASE} ${DEBIAN_POOLS}"
         echo "# Uncomment line below then 'apt-get update' to enable 'apt-get source'"
-        echo "#deb-src ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}"
+        echo "#deb-src [arch=armhf] ${DEBOOTSTRAP_URL}-security ${DEBIAN_RELEASE}-security ${DEBIAN_POOLS}"
     ) | tee /etc/apt/sources.list
 else
     DEBIAN_POOLS="main contrib non-free non-free-firmware"
