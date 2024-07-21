@@ -94,25 +94,25 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 
 ### `BerryOS/armhf`
 
-| Stat                   | BerryOS Bookworm (2024.07.05) | RaspiOS Lite Bookworm (2024-03-12) |
+| Stat                   | BerryOS Bookworm (2024.07.21) | RaspiOS Lite Bookworm (2024-07-04) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
-| RAM usage              | 94M                           | 106M                               |
+| RAM usage              | 99M                           | 110M                               |
 | Running processes      | 10                            | 16                                 |
-| Disk usage             | 898M                          | 1.6G                               |
-| Pre-installed packages | 333                           | 601                                |
-| Download size          | 353M                          | 475M                               |
-| Image size             | 1340M                         | 2424M                              |
+| Disk usage             | 880M                          | 1.7G                               |
+| Pre-installed packages | 333                           | 603                                |
+| Download size          | 361M                          | 500M                               |
+| Image size             | 1344M                         | 2512M                              |
 
 ### `BerryOS/arm64`
 
-| Stat                   | BerryOS Bookworm (2024.07.05) | RaspiOS Lite Bookworm (2024-03-12) |
+| Stat                   | BerryOS Bookworm (2024.07.21) | RaspiOS Lite Bookworm (2024-07-04) |
 | ---------------------- | ----------------------------- | ---------------------------------- |
-| RAM usage              | 118M                          | 126M                               |
+| RAM usage              | 116M                          | 131M                               |
 | Running processes      | 10                            | 16                                 |
-| Disk usage             | 852M                          | 1.7G                               |
-| Pre-installed packages | 310                           | 588                                |
-| Download size          | 277M                          | 415M                               |
-| Image size             | 1356M                         | 2640M                              |
+| Disk usage             | 856M                          | 1.8G                               |
+| Pre-installed packages | 310                           | 590                                |
+| Download size          | 288M                          | 432M                               |
+| Image size             | 1296M                         | 2704M                              |
 
 ## Acknowledgements
 

@@ -1,2 +1,3 @@
-/etc/**		text eol=lf
-/boot/**	text eol=crlf
+/etc/**		text	eol=lf
+/usr/**		text	eol=lf
+/boot/**	text	eol=crlf
