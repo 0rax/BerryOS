@@ -11,7 +11,7 @@ users:
   - default
 
 ## Configure default user access
-password: berryosd
+password: berryos
 chpasswd: { expire: false }
 ssh_pwauth: true
 

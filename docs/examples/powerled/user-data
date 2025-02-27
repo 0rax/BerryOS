@@ -1,0 +1,6 @@
+#cloud-config
+# vim: syntax=yaml
+
+password: berryos                   # Set default user password
+chpasswd: { expire: false }         # Do not expire password after first login
+ssh_pwauth: true                    # Enable SSH password authentication for default user

@@ -1,0 +1,20 @@
+#cloud-config
+# vim: syntax=yaml
+#
+# BerryOS Cloud Config
+#
+
+## Configure language
+locale: en_US.UTF-8
+
+## Configure default user access
+password: berryos                   # Set default user password
+chpasswd: { expire: false }         # Do not expire password after first login
+ssh_pwauth: true                    # Enable SSH password authentication for default user
+
+# # Update package list, upgrade system or install new packages on first boot
+package_update: true                # Update package list
+package_upgrade: true               # Update system package on first-noot
+package_reboot_if_required: true    # Reboot system after installing or upgrading if needed
+packages:                           # Install additional packages
+  - vim
