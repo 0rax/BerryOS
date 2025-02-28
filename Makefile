@@ -17,7 +17,7 @@ builder:
 
 armhf: builder
 	$(info [BerryOS] Build for armhf)
-	docker compose run builder make rootfs image \
+	docker compose run builder make rootfs image checksums \
 	    OS_NAME="$(OS_NAME)" \
 	    OS_VERSION="$(OS_VERSION)" \
 	    OS_REPO="$(OS_REPO)" \
@@ -28,7 +28,7 @@ armhf: builder
 
 arm64: builder
 	$(info [BerryOS] Build for arm64)
-	docker compose run builder make rootfs image \
+	docker compose run builder make rootfs image checksums \
 	    OS_NAME="$(OS_NAME)" \
 	    OS_VERSION="$(OS_VERSION)" \
 	    OS_REPO="$(OS_REPO)" \
@@ -62,24 +62,14 @@ image:
 	    BUILD_ARCH="$(BUILD_ARCH)" \
 	    ./scripts/10-export.sh
 
-.PHONY: rootfs image
-
-## Release rules
-
-release: armhf arm64 checksums
-
+checksums: BUILD_ARCH ?= armhf
 checksums:
-	$(info [BerryOS] Generate checksums)
+	$(info [BerryOS/$(BUILD_ARCH)] Generate checksums)
 	cd out/ \
 	&& sha256sum \
-	    berryos-arm64-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION))-rootfs.tar.xz \
-	    berryos-arm64-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION))-packages.txt \
-	    berryos-arm64-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION)).img.xz \
-	    > berryos-arm64-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION))-checksums.txt \
-	&& sha256sum \
-	    berryos-armhf-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION))-rootfs.tar.xz \
-	    berryos-armhf-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION))-packages.txt \
-	    berryos-armhf-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION)).img.xz \
-	    > berryos-armhf-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION))-checksums.txt
+	    berryos-$(BUILD_ARCH)-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION))-rootfs.tar.xz \
+	    berryos-$(BUILD_ARCH)-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION))-packages.txt \
+	    berryos-$(BUILD_ARCH)-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION)).img.xz \
+	    > berryos-$(BUILD_ARCH)-$(DEBIAN_RELEASE)-$(subst .,,$(OS_VERSION))-checksums.txt \
 
-.PHONY: release checksums
+.PHONY: rootfs image checksums
