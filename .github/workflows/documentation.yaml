@@ -4,12 +4,16 @@ on:
   push:
     branches:
       - main
+    paths:
+      - docs/**
   pull_request:
     types:
       - opened
       - ready_for_review
       - reopened
       - synchronize
+    paths:
+      - docs/**
   workflow_dispatch:
 
 permissions:
