@@ -37,12 +37,12 @@ jobs:
         uses: actions/jekyll-build-pages@v1
         with:
           source: ./docs
-          destination: ./_site
+          destination: ./docs/_site
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./_site
-          retention-days: 7
+          path: ./docs/_site
+          retention-days: 30
 
   deploy:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
