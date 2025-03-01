@@ -30,7 +30,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: out/
-          pattern: berryos-*
+          pattern: |
+            berryos-*.img.xz
+            berryos-*-checksums.txt
           merge-multiple: true
       - name: Update nightly release
         uses: ncipollo/release-action@v1
@@ -43,17 +45,19 @@ jobs:
 
             This is an automated nightly release. It includes daily built version of the BerryOS images.
 
-            These builds are provided without any warranty. No manual testing and benchmarks have been performed.
-
-            If you prefer a stable release, please download the [latest stable release](https://github.com/0rax/BerryOS/releases/latest).
-
-            ## Why use a nightly build?
+            ### Why use a nightly build?
 
             Nightly builds allow you to make sure you are using an image that includes the latest version of all install packages. Making the initial setup of BerryOS faster.
 
             It shouldn't be much different than using a stable release, but it might be a bit more unstable, especially during major updates (when BerryOS needs to be synced with the latest changes from Raspberry Pi OS).
 
-            ## Issues
+            ### Disclaimer
+
+            These builds are provided without any warranty. No manual testing and benchmarks have been performed.
+
+            If you prefer a stable release, please download the [latest stable release](https://github.com/0rax/BerryOS/releases/latest).
+
+            ### Issues
 
             If you find any issues when using a nightly build, please report them to the [issue tracker](https://github.com/0rax/BerryOS/issues). Make sure to include the content of `/etc/rpi-issue` in your report so we can pin-point the specific build you are using.
           removeArtifacts: true
