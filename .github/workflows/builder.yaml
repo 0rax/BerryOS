@@ -1,4 +1,4 @@
-name: Build Image
+name: BerryOS Builder
 
 on:
   workflow_call:
@@ -45,6 +45,10 @@ on:
           - bullseye
           - bookworm
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   rootfs:
     runs-on: ubuntu-latest
@@ -54,18 +58,18 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
+    env:
+      BUILD_DIR: ${{ github.workspace }}
+      OUTPUT_DIR: ${{ github.workspace }}/out
+      OS_VERSION: ${{ inputs.os_version }}
+      GIT_HASH: ${{ github.sha }}
+      DEBIAN_VERSION: ${{ inputs.debian_version }}
+      DEBIAN_RELEASE: ${{ inputs.debian_release }}
+      BUILD_ARCH: ${{ inputs.build_arch }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Bootstrap rootfs
-        env:
-          BUILD_DIR: ${{ github.workspace }}
-          OUTPUT_DIR: ${{ github.workspace }}/out
-          OS_VERSION: ${{ inputs.os_version }}
-          GIT_HASH: ${{ github.sha }}
-          DEBIAN_VERSION: ${{ inputs.debian_version }}
-          DEBIAN_RELEASE: ${{ inputs.debian_release }}
-          BUILD_ARCH: ${{ inputs.build_arch }}
         run: |
           ./scripts/00-bootstrap.sh
       - name: Upload rootfs
@@ -87,6 +91,12 @@ jobs:
         password: ${{ secrets.github_token }}
       volumes:
         - berryos-output:/tmp/berryos-output
+    env:
+      BUILD_DIR: ${{ github.workspace }}
+      OUTPUT_DIR: ${{ github.workspace }}/out
+      OS_VERSION: ${{ inputs.os_version }}
+      DEBIAN_RELEASE: ${{ inputs.debian_release }}
+      BUILD_ARCH: ${{ inputs.build_arch }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -96,44 +106,16 @@ jobs:
           name: berryos-${{ inputs.build_arch }}-rootfs
           path: out/
       - name: Export image
-        env:
-          BUILD_DIR: ${{ github.workspace }}
-          OUTPUT_DIR: ${{ github.workspace }}/out
-          OS_VERSION: ${{ inputs.os_version }}
-          DEBIAN_RELEASE: ${{ inputs.debian_release }}
-          BUILD_ARCH: ${{ inputs.build_arch }}
         run: |
           ./scripts/10-export.sh
+      - name: Generate checksum
+        run: |
+          sha256sum "out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-${OS_VERSION//.}.img.xz" \
+            > "out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-${OS_VERSION//.}.img.xz.sha256"
       - name: Upload image
         uses: actions/upload-artifact@v4
         with:
           name: berryos-${{ inputs.build_arch }}-image
-          path: out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-*.img.xz
-
-  checksums:
-    needs: image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: out/
-          pattern: berryos-${{ inputs.build_arch }}-*
-          merge-multiple: true
-      - name: Generate checksums
-        env:
-          OS_VERSION: ${{ inputs.os_version }}
-        run: |
-          sha256sum \
-            out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-${OS_VERSION//.}-rootfs.tar.xz \
-            out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-${OS_VERSION//.}-packages.txt \
-            out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-${OS_VERSION//.}.img.xz \
-            > out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-${OS_VERSION//.}-checksums.txt
-      - name: Upload checksums
-        uses: actions/upload-artifact@v4
-        with:
-          name: berryos-${{ inputs.build_arch }}-checksums
           path: |
-            out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-*-checksums.txt
+            out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-*.img.xz
+            out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-*.img.xz.sha256
