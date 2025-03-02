@@ -56,11 +56,25 @@ jobs:
 
             ### Disclaimer
 
-            These builds are provided without any warranty. No manual testing and benchmarks have been performed.
+            These builds are provided without any warranty. No manual testing or benchmarks have been performed.
 
             If you prefer a stable release, please download the [latest stable release](https://github.com/0rax/BerryOS/releases/latest).
 
-            ### Issues
+            ## Compatibility
+
+            - `BerryOS/armhf`
+              - Image: [`berryos-armhf-bookworm-nightly.img.xz`](https://github.com/0rax/BerryOS/releases/download/bookworm-nightly/berryos-armhf-bookworm-nightly.img.xz)
+              - Compatibility: all Raspberry Pi models
+
+            - `BerryOS/arm64`
+              - Image [`berryos-arm64-bookworm-nightly.img.xz`](https://github.com/0rax/BerryOS/releases/download/bookworm-nightly/berryos-arm64-bookworm-nightly.img.xz)
+              - Compatibility:
+                - Raspberry Pi 3B, 3B+, 4 B & 400
+                - Compute Module 3, 3+ & 4
+                - Raspberry Pi Zero 2 W
+                - Raspberry Pi 5
+
+            ## Issues
 
             If you find any issues when using a nightly build, please report them to the [issue tracker](https://github.com/0rax/BerryOS/issues). Make sure to include the content of `/etc/rpi-issue` in your report so we can pin-point the specific build you are using.
           artifacts: "out/*"
