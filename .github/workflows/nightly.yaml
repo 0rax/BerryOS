@@ -11,6 +11,10 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: "nightly"
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
@@ -60,5 +64,6 @@ jobs:
             ### Issues
 
             If you find any issues when using a nightly build, please report them to the [issue tracker](https://github.com/0rax/BerryOS/issues). Make sure to include the content of `/etc/rpi-issue` in your report so we can pin-point the specific build you are using.
-          removeArtifacts: true
           artifacts: "out/*"
+          allowUpdates: true
+          removeArtifacts: true
