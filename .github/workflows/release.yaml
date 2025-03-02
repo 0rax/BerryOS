@@ -26,7 +26,7 @@ jobs:
     strategy:
       matrix:
         build_arch: ["armhf", "arm64"]
-    uses: ./.github/workflows/build.yaml
+    uses: ./.github/workflows/builder.yaml
     with:
       os_version: nightly
       debian_version: 12

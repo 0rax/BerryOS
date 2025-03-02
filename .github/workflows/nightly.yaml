@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: "nightly"
+  group: "bookworm-nightly"
   cancel-in-progress: true
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         build_arch: ["armhf", "arm64"]
-    uses: ./.github/workflows/build.yaml
+    uses: ./.github/workflows/builder.yaml
     with:
       os_version: nightly
       debian_version: 12
@@ -35,8 +35,7 @@ jobs:
         with:
           path: out/
           pattern: |
-            berryos-*.img.xz
-            berryos-*-checksums.txt
+            berryos-*-image
           merge-multiple: true
       - name: Update nightly release
         uses: ncipollo/release-action@v1
