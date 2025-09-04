@@ -10,10 +10,6 @@ on:
       os_version:
         type: string
         default: "nightly"
-      debian_version:
-        type: number
-        required: true
-        default: 12
       debian_release:
         type: string
         required: true
@@ -22,6 +18,7 @@ on:
     inputs:
       build_arch:
         type: choice
+        description: "Target architecture"
         required: true
         default: armhf
         options:
@@ -29,16 +26,11 @@ on:
           - arm64
       os_version:
         type: string
+        description: "OS Version"
         default: "nightly"
-      debian_version:
-        type: choice
-        required: true
-        default: 12
-        options:
-          - 11
-          - 12
       debian_release:
         type: choice
+        description: "Base Debian release"
         required: true
         default: bookworm
         options:
@@ -63,7 +55,6 @@ jobs:
       OUTPUT_DIR: ${{ github.workspace }}/out
       OS_VERSION: ${{ inputs.os_version }}
       GIT_HASH: ${{ github.sha }}
-      DEBIAN_VERSION: ${{ inputs.debian_version }}
       DEBIAN_RELEASE: ${{ inputs.debian_release }}
       BUILD_ARCH: ${{ inputs.build_arch }}
     steps:

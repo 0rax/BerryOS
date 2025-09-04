@@ -5,17 +5,12 @@ on:
     inputs:
       os_version:
         type: string
+        description: "OS Version"
         default: "nightly"
-      debian_version:
-        type: choice
-        required: true
-        default: 12
-        options:
-          - 11
-          - 12
       debian_release:
         type: choice
         required: true
+        description: "Base Debian release"
         default: bookworm
         options:
           - bullseye
@@ -28,7 +23,6 @@ jobs:
         build_arch: ["armhf", "arm64"]
     uses: ./.github/workflows/builder.yaml
     with:
-      os_version: nightly
-      debian_version: 12
-      debian_release: bookworm
+      os_version: ${{ inputs.os_version }}
+      debian_release: ${{ inputs.debian_release }}
       build_arch: ${{ matrix.build_arch }}

@@ -23,7 +23,6 @@ jobs:
     uses: ./.github/workflows/builder.yaml
     with:
       os_version: nightly
-      debian_version: 12
       debian_release: bookworm
       build_arch: ${{ matrix.build_arch }}
   release:

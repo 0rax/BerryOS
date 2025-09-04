@@ -15,8 +15,21 @@ GIT_HASH="${GIT_HASH:-"main"}"
 
 ## Debian base
 DEBIAN_VARIANT="Debian GNU/Linux"
-DEBIAN_VERSION="${DEBIAN_VERSION:-"12"}"
 DEBIAN_RELEASE="${DEBIAN_RELEASE:-"bookworm"}"
+DEBIAN_VERSION=""
+case "${DEBIAN_RELEASE}" in
+  "bullseye")
+    DEBIAN_VERSION="11";;
+  "bookworm")
+    DEBIAN_VERSION="12";;
+  "trixie")
+    DEBIAN_VERSION="13";;
+  "forky")
+    DEBIAN_VERSION="14";;
+  "duke")
+    DEBIAN_VERSION="15";;
+esac
+
 
 ## Build path
 SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
