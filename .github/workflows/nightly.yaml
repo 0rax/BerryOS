@@ -30,11 +30,18 @@ jobs:
           pattern: |
             berryos-*-image
           merge-multiple: true
+      - name: Generate environment
+        env:
+          OS_VERSION: "nightly"
+          DEBIAN_RELEASE: "bookworm"
+        run: |
+          echo "RELEASE_NAME=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^} ($(date --utc "+%Y-%m-%d"))" >> "${GITHUB_ENV}"
+          echo "ARTIFACT_SUFFIX=${DEBIAN_RELEASE,,}-${OS_VERSION//.}" >> "${GITHUB_ENV}"
       - name: Update nightly release
         uses: ncipollo/release-action@v1
         with:
           tag: bookworm-nightly
-          name: BerryOS Bookworm Nightly
+          name: ${{ env.RELEASE_NAME }}
           prerelease: true
           body: |
             ## Nightly Builds
@@ -56,11 +63,11 @@ jobs:
             ## Compatibility
 
             - `BerryOS/armhf`
-              - Image: [`berryos-armhf-bookworm-nightly.img.xz`](https://github.com/0rax/BerryOS/releases/download/bookworm-nightly/berryos-armhf-bookworm-nightly.img.xz)
+              - Image: [`berryos-armhf-${{ env.ARTIFACT_SUFFIX }}.img.xz`](https://github.com/0rax/BerryOS/releases/download/bookworm-nightly/berryos-armhf-${{ env.ARTIFACT_SUFFIX }}.img.xz)
               - Compatibility: all Raspberry Pi models
 
             - `BerryOS/arm64`
-              - Image [`berryos-arm64-bookworm-nightly.img.xz`](https://github.com/0rax/BerryOS/releases/download/bookworm-nightly/berryos-arm64-bookworm-nightly.img.xz)
+              - Image [`berryos-arm64-${{ env.ARTIFACT_SUFFIX }}.img.xz`](https://github.com/0rax/BerryOS/releases/download/bookworm-nightly/berryos-arm64-${{ env.ARTIFACT_SUFFIX }}.img.xz)
               - Compatibility:
                 - Raspberry Pi 3B, 3B+, 4 B & 400
                 - Compute Module 3, 3+ & 4
