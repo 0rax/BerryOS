@@ -15,7 +15,7 @@ on:
         options:
           - bullseye
           - bookworm
-  pull_request:
+  push:
 
 jobs:
   # build:
@@ -49,11 +49,14 @@ jobs:
       - name: Draft release
         id: release_drafter
         uses: release-drafter/release-drafter@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-name: release-drafter.yml
           name: ${{ env.RELEASE_NAME }}
           tag: ${{ env.RELEASE_TAG }}
           version: ${{ inputs.os_version }}
+          commitish: ${{ github.ref_name }}
           publish: false
           footer: |
             ## Compatibility
@@ -73,9 +76,13 @@ jobs:
             ## Issues
 
             If you find any issues when using this release, please report them to the [issue tracker](https://github.com/0rax/BerryOS/issues). Make sure to include the complete name of the release you are using or the content of `/etc/rpi-issue` in your report.
-      # - name: Upload release artifacts
-      #   id: upload_artifacts
-      #   uses: softprops/action-gh-release@v2
-      #   with:
-      #     tag_name: ${{ steps.release_drafter.outputs.tag_name }}
-      #     files: out/*
+      - name: Check Release Drafter output
+        if: steps.released_rafter.outputs.id == ''
+        run: exit 1
+      - name: Upload release artifacts
+        id: upload_artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_drafter.outputs.tag_name }}
+          files: out/*
+          fail_on_unmatched_files: true
