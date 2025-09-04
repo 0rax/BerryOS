@@ -1,4 +1,4 @@
-name: Release
+name: Prepare Release
 
 on:
   workflow_dispatch:
@@ -15,19 +15,20 @@ on:
         options:
           - bullseye
           - bookworm
+  pull_request:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        build_arch: ["armhf", "arm64"]
-    uses: ./.github/workflows/builder.yaml
-    with:
-      os_version: ${{ inputs.os_version }}
-      debian_release: ${{ inputs.debian_release }}
-      build_arch: ${{ matrix.build_arch }}
+  # build:
+  #   strategy:
+  #     matrix:
+  #       build_arch: ["armhf", "arm64"]
+  #   uses: ./.github/workflows/builder.yaml
+  #   with:
+  #     os_version: ${{ inputs.os_version }}
+  #     debian_release: ${{ inputs.debian_release }}
+  #     build_arch: ${{ matrix.build_arch }}
   draft-release:
-    needs: build
+    # needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
@@ -43,16 +44,38 @@ jobs:
           DEBIAN_RELEASE: ${{ inputs.debian_release }}
         run: |
           echo "RELEASE_NAME=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^}" >> "${GITHUB_ENV}"
+          echo "RELEASE_TAG=${DEBIAN_RELEASE}-${OS_VERSION}" >> "${GITHUB_ENV}"
           echo "ARTIFACT_SUFFIX=${DEBIAN_RELEASE,,}-${OS_VERSION//.}" >> "${GITHUB_ENV}"
-      - name: Generate release-note
-        uses: ncipollo/release-action@v1
+      - name: Draft release
+        id: release_drafter
+        uses: release-drafter/release-drafter@v6
         with:
-          tag: ${{ inputs.debian_release }}-${{ inputs.os_version }}
+          config-name: release-drafter.yml
           name: ${{ env.RELEASE_NAME }}
-          draft: true
-          generateReleaseNotes: true
-          artifacts: "out/*"
-          allowUpdates: false
-          skipIfReleaseExists: true
-          updateOnlyUnreleased: true
-          removeArtifacts: true
+          tag: ${{ env.RELEASE_TAG }}
+          version: ${{ inputs.os_version }}
+          publish: false
+          footer: |
+            ## Compatibility
+
+            - `BerryOS/armhf`
+              - Image: [`berryos-armhf-${{ env.ARTIFACT_SUFFIX }}.img.xz`](https://github.com/0rax/BerryOS/releases/download/${{ env.RELEASE_TAG }}/berryos-armhf-${{ env.ARTIFACT_SUFFIX }}.img.xz)
+              - Compatibility: all Raspberry Pi models
+
+            - `BerryOS/arm64`
+              - Image [`berryos-arm64-${{ env.ARTIFACT_SUFFIX }}.img.xz`](https://github.com/0rax/BerryOS/releases/download/${{ env.RELEASE_TAG }}/berryos-arm64-${{ env.ARTIFACT_SUFFIX }}.img.xz)
+              - Compatibility:
+                - Raspberry Pi 3B, 3B+, 4 B & 400
+                - Compute Module 3, 3+ & 4
+                - Raspberry Pi Zero 2 W
+                - Raspberry Pi 5
+
+            ## Issues
+
+            If you find any issues when using this release, please report them to the [issue tracker](https://github.com/0rax/BerryOS/issues). Make sure to include the complete name of the release you are using or the content of `/etc/rpi-issue` in your report.
+      # - name: Upload release artifacts
+      #   id: upload_artifacts
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     tag_name: ${{ steps.release_drafter.outputs.tag_name }}
+      #     files: out/*
