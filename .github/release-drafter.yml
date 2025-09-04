@@ -1,3 +1,4 @@
+version-template: "$COMPLETE"
 name-template: "BerryOS Bookworm $RESOLVED_VERSION"
 tag-template: "$RESOLVED_VERSION"
 change-template: "- $TITLE (#$NUMBER by @$AUTHOR)"

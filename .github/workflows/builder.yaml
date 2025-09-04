@@ -5,13 +5,16 @@ on:
     inputs:
       build_arch:
         type: string
+        description: "Target architecture"
         required: true
         default: armhf
       os_version:
         type: string
+        description: "OS Version"
         default: "nightly"
       debian_release:
         type: string
+        description: "Base Debian release"
         required: true
         default: bookworm
   workflow_dispatch:
