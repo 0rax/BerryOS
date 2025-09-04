@@ -41,7 +41,7 @@ jobs:
       - name: Update nightly release
         uses: softprops/action-gh-release@v2
         with:
-          tag: ${{ env.RELEASE_TAG }}
+          tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_NAME }}
           draft: false
           prerelease: true
@@ -80,5 +80,4 @@ jobs:
 
             If you find any issues when using a nightly build, please report them to the [issue tracker](https://github.com/0rax/BerryOS/issues). Make sure to include the content of `/etc/rpi-issue` in your report so we can pin-point the specific build you are using.
           files: out/*
-          overwrite_files: true
           fail_on_unmatched_files: true

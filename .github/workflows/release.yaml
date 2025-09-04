@@ -15,20 +15,19 @@ on:
         options:
           - bullseye
           - bookworm
-  push:
 
 jobs:
-  # build:
-  #   strategy:
-  #     matrix:
-  #       build_arch: ["armhf", "arm64"]
-  #   uses: ./.github/workflows/builder.yaml
-  #   with:
-  #     os_version: ${{ inputs.os_version }}
-  #     debian_release: ${{ inputs.debian_release }}
-  #     build_arch: ${{ matrix.build_arch }}
+  build:
+    strategy:
+      matrix:
+        build_arch: ["armhf", "arm64"]
+    uses: ./.github/workflows/builder.yaml
+    with:
+      os_version: ${{ inputs.os_version }}
+      debian_release: ${{ inputs.debian_release }}
+      build_arch: ${{ matrix.build_arch }}
   draft-release:
-    # needs: build
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
