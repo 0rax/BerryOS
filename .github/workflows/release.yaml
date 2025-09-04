@@ -26,3 +26,26 @@ jobs:
       os_version: ${{ inputs.os_version }}
       debian_release: ${{ inputs.debian_release }}
       build_arch: ${{ matrix.build_arch }}
+  draft-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: out/
+          pattern: |
+            berryos-*-image
+          merge-multiple: true
+      - name: Generate release-note
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ input.debian_release }}-${{ input.os_version }}
+          name: BerryOS ${{ input.debian_release }} ${{ input.os_version }}
+          draft: true
+          generateReleaseNotes: true
+          artifacts: "out/*"
+          allowUpdates: false
+          skipIfReleaseExists: true
+          updateOnlyUnreleased: true
+          removeArtifacts: true
