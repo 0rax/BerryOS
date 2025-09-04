@@ -37,11 +37,18 @@ jobs:
           pattern: |
             berryos-*-image
           merge-multiple: true
+      - name: Generate environment
+        env:
+          OS_VERSION: ${{ inputs.os_version }}
+          DEBIAN_RELEASE: ${{ inputs.debian_release }}
+        run: |
+          echo "RELEASE_NAME=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^}" >> "${GITHUB_ENV}"
+          echo "ARTIFACT_SUFFIX=${DEBIAN_RELEASE,,}-${OS_VERSION//.}" >> "${GITHUB_ENV}"
       - name: Generate release-note
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ input.debian_release }}-${{ input.os_version }}
-          name: BerryOS ${{ input.debian_release }} ${{ input.os_version }}
+          tag: ${{ inputs.debian_release }}-${{ inputs.os_version }}
+          name: ${{ env.RELEASE_NAME }}
           draft: true
           generateReleaseNotes: true
           artifacts: "out/*"
