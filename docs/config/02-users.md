@@ -106,11 +106,12 @@ users:
     groups:                             # User groups
       [adm, dialout, cdrom, sudo, audio, video, plugdev, games, users, input, render, netdev]
     passwd: berryos                     # User password
-    chpasswd: { expire: false }         # Do not expire user password
-    ssh_pwauth: false                   # Disabble SSH password auth
     ssh_authorized_keys: []             # List of ssh authorized keys
     ssh_import_id:
       - gh:0rax                         # Import authorized keys from GitHub
+
+chpasswd: { expire: false }     # Do not expire user password
+ssh_pwauth: false               # Disabble SSH password auth
 ```
 
 You can also use this directive to create `system` users if the application you will be setting up requires it:
