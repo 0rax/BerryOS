@@ -15,13 +15,27 @@ GIT_HASH="${GIT_HASH:-"main"}"
 
 ## Debian base
 DEBIAN_VARIANT="Debian GNU/Linux"
-DEBIAN_VERSION="${DEBIAN_VERSION:-"12"}"
 DEBIAN_RELEASE="${DEBIAN_RELEASE:-"bookworm"}"
+DEBIAN_VERSION=""
+case "${DEBIAN_RELEASE}" in
+  "bullseye")
+    DEBIAN_VERSION="11";;
+  "bookworm")
+    DEBIAN_VERSION="12";;
+  "trixie")
+    DEBIAN_VERSION="13";;
+  "forky")
+    DEBIAN_VERSION="14";;
+  "duke")
+    DEBIAN_VERSION="15";;
+esac
+
 
 ## Build path
+SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 BUILD_DIR="${BUILD_DIR:-/opt/bootstrap}"
 FILES_DIR="${BUILD_DIR}/rootfs"
-OUTPUT_DIR="${BUILD_DIR}/out"
+OUTPUT_DIR="${OUTPUT_DIR:-${BUILD_DIR}/out}"
 ROOTFS_TAR="${OUTPUT_DIR}/${OS_NAME,,}-${BUILD_ARCH}-${DEBIAN_RELEASE}-${OS_VERSION//.}-rootfs.tar.xz"
 ROOTFS_PKGS="${OUTPUT_DIR}/${OS_NAME,,}-${BUILD_ARCH}-${DEBIAN_RELEASE}-${OS_VERSION//.}-packages.txt"
 
@@ -124,7 +138,7 @@ configure_rootfs () {
         DEBIAN_VARIANT="${DEBIAN_VARIANT}" \
         DEBIAN_RELEASE="${DEBIAN_RELEASE}" \
         DEBOOTSTRAP_URL="${DEBOOTSTRAP_URL}" \
-        /bin/bash < "${BUILD_DIR}/scripts/01-chroot.sh"
+        /bin/bash < "${SCRIPT_DIR}/01-chroot.sh"
     chroot "${ROOTFS_DIR}" dpkg --get-selections | awk '{ print $1 }' > "${ROOTFS_PKGS}"
 
     # Copy static system configuration files

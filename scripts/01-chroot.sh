@@ -10,6 +10,7 @@ fi
 OS_NAME="${OS_NAME?}"
 OS_VERSION="${OS_VERSION?}"
 BUILD_ARCH="${BUILD_ARCH:-$(dpkg --print-architecture)}"
+GIT_HASH="${GIT_HASH?}"
 
 ## Debian base
 DEBIAN_VARIANT="${DEBIAN_VARIANT?}"
@@ -108,10 +109,12 @@ rm -f /etc/sudoers.d/010_pi-nopasswd
 ## Setup OS specifics
 
 # Setup rpi-issue
-tee /etc/rpi-issue << EOF
-${OS_NAME} ${OS_VERSION}
-Generated using berryos-builder, ${OS_REPO}, ${GIT_HASH}, ${BUILD_ARCH}
-EOF
+if [ "${OS_VERSION}" = "nightly" ]; then
+    echo "${OS_NAME}/${BUILD_ARCH} ${DEBIAN_RELEASE^} ${OS_VERSION^} ($(date --utc "+%Y-%m-%d"))" | tee /etc/rpi-issue
+else
+    echo "${OS_NAME}/${BUILD_ARCH} ${DEBIAN_RELEASE^} ${OS_VERSION^}" | tee /etc/rpi-issue
+fi
+echo "Generated using berryos-builder, ${OS_REPO}, ${GIT_HASH}, ${BUILD_ARCH}" | tee -a /etc/rpi-issue
 
 install -m 644 /etc/rpi-issue /boot/firmware/issue.txt
 if ! [ -L /boot/issue.txt ]; then
@@ -122,7 +125,7 @@ fi
 DEBIAN_ISSUE=$(cat /etc/issue.net)
 tee /etc/motd << EOF
 
-${OS_NAME}/${BUILD_ARCH} ${OS_VERSION} (${DEBIAN_ISSUE})
+${OS_NAME}/${BUILD_ARCH} ${DEBIAN_RELEASE^} ${OS_VERSION^} (${DEBIAN_ISSUE})
 
 The programs included with the Debian GNU/Linux system are free software;
 the exact distribution terms for each program are described in the

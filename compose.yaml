@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   builder:
-    image: berryos-bootstraper
+    image: ghcr.io/0rax/berryos-builder
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,7 +9,7 @@ services:
     working_dir: /opt/bootstrap
     privileged: true
   docs:
-    image: berryos-jekyll
+    image: ghcr.io/0rax/berryos-jekyll
     build:
       context: .
       dockerfile: Dockerfile.docs
