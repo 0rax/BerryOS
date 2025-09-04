@@ -1,12 +1,12 @@
-name-template: "BerryOS Bookworm $RESOLVED_VERSION"
-tag-template: "$RESOLVED_VERSION"
+name-template: "BerryOS Bookworm $COMPLETE"
+tag-template: "$COMPLETE"
 change-template: "- $TITLE (#$NUMBER by @$AUTHOR)"
 template: |
   ## Changelog
 
   $CHANGES
 
-  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_VERSION
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$COMPLETE
 exclude-contributors:
   - 'dependabot'
   - 'dependabot[bot]'
