@@ -1,4 +1,4 @@
-name: Release
+name: Prepare Release
 
 on:
   workflow_dispatch:
@@ -30,6 +30,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
@@ -41,18 +45,51 @@ jobs:
         env:
           OS_VERSION: ${{ inputs.os_version }}
           DEBIAN_RELEASE: ${{ inputs.debian_release }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          echo "RELEASE_NAME=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^}" >> "${GITHUB_ENV}"
-          echo "ARTIFACT_SUFFIX=${DEBIAN_RELEASE,,}-${OS_VERSION//.}" >> "${GITHUB_ENV}"
-      - name: Generate release-note
-        uses: ncipollo/release-action@v1
+          echo "RELEASE_PREV=$(gh release view --json tagName -q .tagName)" | tee -a "${GITHUB_ENV}"
+          echo "RELEASE_NAME=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^}" | tee -a  "${GITHUB_ENV}"
+          echo "RELEASE_TAG=${DEBIAN_RELEASE}-${OS_VERSION}" | tee -a "${GITHUB_ENV}"
+          echo "ARTIFACT_SUFFIX=${DEBIAN_RELEASE,,}-${OS_VERSION//.}" | tee -a "${GITHUB_ENV}"
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v4
+        id: git-cliff
         with:
-          tag: ${{ inputs.debian_release }}-${{ inputs.os_version }}
+          config: .github/cliff.toml
+          args: --tag "${RELEASE_TAG}" -- "${RELEASE_PREV}..HEAD"
+        env:
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_NAME }}
           draft: true
-          generateReleaseNotes: true
-          artifacts: "out/*"
-          allowUpdates: false
-          skipIfReleaseExists: true
-          updateOnlyUnreleased: true
-          removeArtifacts: true
+          target_commitish: ${{ github.ref_name }}
+          body: |
+            ## Changelog
+
+            ${{ steps.git-cliff.outputs.content }}
+
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ env.RELEASE_PREV }}...${{ env.RELEASE_TAG }}
+
+            ## Compatibility
+
+            - `BerryOS/armhf`
+              - Image: [`berryos-armhf-${{ env.ARTIFACT_SUFFIX }}.img.xz`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/berryos-armhf-${{ env.ARTIFACT_SUFFIX }}.img.xz)
+              - Compatibility: all Raspberry Pi models
+
+            - `BerryOS/arm64`
+              - Image [`berryos-arm64-${{ env.ARTIFACT_SUFFIX }}.img.xz`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/berryos-arm64-${{ env.ARTIFACT_SUFFIX }}.img.xz)
+              - Compatibility:
+                - Raspberry Pi 3B, 3B+, 4 B & 400
+                - Compute Module 3, 3+ & 4
+                - Raspberry Pi Zero 2 W
+                - Raspberry Pi 5
+
+            ## Issues
+
+            If you find any issues when using this release, please report them to the [issue tracker](https://github.com/${{ github.repository }}/issues). Make sure to include the complete name of the release you are using or the content of `/etc/rpi-issue` in your report.
+          files: out/*
+          fail_on_unmatched_files: true
