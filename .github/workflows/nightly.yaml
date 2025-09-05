@@ -45,6 +45,7 @@ jobs:
           name: ${{ env.RELEASE_NAME }}
           draft: false
           prerelease: true
+          commitish: ${{ github.ref_name }}
           body: |
             ## Nightly Builds
 
