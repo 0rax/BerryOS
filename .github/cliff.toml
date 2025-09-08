@@ -19,6 +19,26 @@ body = """
     {%- endif %}
   {%- raw %}\n{% endraw -%}
 {%- endfor -%}
+{%- if commits | length == 0 -%}
+_No changes since last release._
+{% endif -%}
+"""
+footer = """
+{%- set latest = releases | first | get(key="version") -%}
+{%- set base   = releases | last  | get(key="previous") | get(key="version") -%}
+{%- set commit = releases | first | get(key="commit_id") %}
+{%- raw %}\n{% endraw -%}
+{%- if base and latest -%}
+**Full Changelog**: https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/compare/{{ base }}...{{ latest }}
+{%- elif latest -%}
+**Full Changelog**: https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commits/{{ latest }}
+{%- elif base and commit -%}
+**Full Changelog**: https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/compare/{{ base }}...{{ commit }}
+{%- elif base -%}
+**Full Changelog**: https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/compare/{{ base }}...HEAD
+{%- else -%}
+**Full Changelog**: https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commits
+{%- endif -%}
 """
 trim = true
 render_always = true
@@ -37,4 +57,4 @@ commit_parsers = [
 filter_commits = false
 sort_commits = "oldest"
 recurse_submodules = false
-ignore_tags = "bookworm-nightly"
+ignore_tags = "bookworm/nightly"

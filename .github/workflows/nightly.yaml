@@ -36,8 +36,18 @@ jobs:
           DEBIAN_RELEASE: "bookworm"
         run: |
           echo "RELEASE_NAME=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^} ($(date --utc "+%Y-%m-%d"))" | tee -a "${GITHUB_ENV}"
+          echo "RELEASE_PREV=$(gh release view --json tagName -q .tagName)" | tee -a "${GITHUB_ENV}"
           echo "RELEASE_TAG=${DEBIAN_RELEASE}/${OS_VERSION}" | tee -a "${GITHUB_ENV}"
           echo "ARTIFACT_SUFFIX=${DEBIAN_RELEASE,,}-${OS_VERSION//.}" | tee -a "${GITHUB_ENV}"
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v4
+        id: git-cliff
+        with:
+          config: .github/cliff.toml
+          args: --tag "${RELEASE_TAG}" -- "${RELEASE_PREV}..HEAD"
+        env:
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Update nightly release
         uses: softprops/action-gh-release@v2
         with:
@@ -62,6 +72,10 @@ jobs:
             These builds are provided without any warranty. No manual testing or benchmarks have been performed.
 
             If you prefer a stable release, please download the [latest stable release](https://github.com/${{ github.repository }}/releases/latest).
+
+            ## Changes since last stable release
+
+            ${{ steps.git-cliff.outputs.changelog }}
 
             ## Compatibility
 

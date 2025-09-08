@@ -47,8 +47,8 @@ jobs:
           DEBIAN_RELEASE: ${{ inputs.debian_release }}
           GH_TOKEN: ${{ github.token }}
         run: |
+          echo "RELEASE_NAME=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^}" | tee -a "${GITHUB_ENV}"
           echo "RELEASE_PREV=$(gh release view --json tagName -q .tagName)" | tee -a "${GITHUB_ENV}"
-          echo "RELEASE_NAME=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^}" | tee -a  "${GITHUB_ENV}"
           echo "RELEASE_TAG=${DEBIAN_RELEASE}/${OS_VERSION}" | tee -a "${GITHUB_ENV}"
           echo "ARTIFACT_SUFFIX=${DEBIAN_RELEASE,,}-${OS_VERSION//.}" | tee -a "${GITHUB_ENV}"
       - name: Generate changelog
@@ -70,9 +70,7 @@ jobs:
           body: |
             ## Changelog
 
-            ${{ steps.git-cliff.outputs.content }}
-
-            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ env.RELEASE_PREV }}...${{ env.RELEASE_TAG }}
+            ${{ steps.git-cliff.outputs.changelog }}
 
             ## Compatibility
 
