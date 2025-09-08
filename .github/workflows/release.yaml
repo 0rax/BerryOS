@@ -3,10 +3,6 @@ name: Prepare Release
 on:
   workflow_dispatch:
     inputs:
-      os_version:
-        type: string
-        description: "OS Version"
-        default: "nightly"
       debian_release:
         type: choice
         required: true
@@ -15,25 +11,40 @@ on:
         options:
           - bullseye
           - bookworm
+      os_version:
+        type: string
+        description: "OS Version"
+        default: "nightly"
+
+concurrency:
+  group: "${{ inputs.debian_release }}-${{ inputs.os_version }}"
+  cancel-in-progress: true
 
 jobs:
   build:
     strategy:
       matrix:
         build_arch: ["armhf", "arm64"]
+        include:
+          - build_arch: armhf
+            job_id: build_armhf
+          - build_arch: arm64
+            job_id: build_arm64
+    name: ${{ matrix.job_id }}
     uses: ./.github/workflows/builder.yaml
     with:
-      os_version: ${{ inputs.os_version }}
       debian_release: ${{ inputs.debian_release }}
+      os_version: ${{ inputs.os_version }}
       build_arch: ${{ matrix.build_arch }}
-  draft-release:
-    needs: build
+  changelog:
+    uses: ./.github/workflows/changelog.yaml
+    with:
+      debian_release: ${{ inputs.debian_release }}
+      os_version: ${{ inputs.os_version }}
+  release:
+    needs: [changelog, build]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
@@ -41,45 +52,26 @@ jobs:
           pattern: |
             berryos-*-image
           merge-multiple: true
-      - name: Generate environment
-        env:
-          OS_VERSION: ${{ inputs.os_version }}
-          DEBIAN_RELEASE: ${{ inputs.debian_release }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          echo "RELEASE_NAME=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^}" | tee -a "${GITHUB_ENV}"
-          echo "RELEASE_PREV=$(gh release view --json tagName -q .tagName)" | tee -a "${GITHUB_ENV}"
-          echo "RELEASE_TAG=${DEBIAN_RELEASE}/${OS_VERSION}" | tee -a "${GITHUB_ENV}"
-          echo "ARTIFACT_SUFFIX=${DEBIAN_RELEASE,,}-${OS_VERSION//.}" | tee -a "${GITHUB_ENV}"
-      - name: Generate changelog
-        uses: orhun/git-cliff-action@v4
-        id: git-cliff
-        with:
-          config: .github/cliff.toml
-          args: --tag "${RELEASE_TAG}" -- "${RELEASE_PREV}..HEAD"
-        env:
-          GITHUB_REPO: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ github.token }}
-      - name: Create draft release
+      - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          name: ${{ env.RELEASE_NAME }}
+          tag_name: ${{ needs.changelog.outputs.tag_name }}
+          name: ${{ needs.changelog.outputs.name }}
           draft: true
           target_commitish: ${{ github.sha }}
           body: |
             ## Changelog
 
-            ${{ steps.git-cliff.outputs.content }}
+            ${{ needs.changelog.outputs.content }}
 
             ## Compatibility
 
             - `BerryOS/armhf`
-              - Image: [`berryos-armhf-${{ env.ARTIFACT_SUFFIX }}.img.xz`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/berryos-armhf-${{ env.ARTIFACT_SUFFIX }}.img.xz)
+              - Image: [`${{ needs.build_armhf.outputs.image }}`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/${{ needs.build_armhf.outputs.image }})
               - Compatibility: all Raspberry Pi models
 
             - `BerryOS/arm64`
-              - Image [`berryos-arm64-${{ env.ARTIFACT_SUFFIX }}.img.xz`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/berryos-arm64-${{ env.ARTIFACT_SUFFIX }}.img.xz)
+              - Image [`${{ needs.build_arm64.outputs.image }}`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/${{ needs.build_arm64.outputs.image }})
               - Compatibility:
                 - Raspberry Pi 3B, 3B+, 4 B & 400
                 - Compute Module 3, 3+ & 4
@@ -88,6 +80,6 @@ jobs:
 
             ## Issues
 
-            If you find any issues when using this release, please report them to the [issue tracker](https://github.com/${{ github.repository }}/issues). Make sure to include the complete name of the release you are using or the content of `/etc/rpi-issue` in your report.
+            If you find any release when using this build, please report them to the [issue tracker](https://github.com/${{ github.repository }}/issues). Make sure to include the the content of `/etc/rpi-issue` (also available in `/boot/firmware/issue.txt`) in your report so we can pin-point the specific build you are using.
           files: out/*
           fail_on_unmatched_files: true
