@@ -75,7 +75,7 @@ jobs:
 
             ## Changes since last stable release
 
-            ${{ steps.git-cliff.outputs.changelog }}
+            ${{ steps.git-cliff.outputs.content }}
 
             ## Compatibility
 
