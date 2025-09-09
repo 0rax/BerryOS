@@ -87,7 +87,7 @@ jobs:
         uses: orhun/git-cliff-action@v4
         with:
           config: .github/cliff.toml
-          args: --tag "${{ steps.env.outputs.tag_name }}" -- "${{ steps.env.outputs.tag_prev }}..HEAD"
+          args: --tag "${{ steps.vars.outputs.tag_name }}" -- "${{ steps.vars.outputs.tag_prev }}..HEAD"
         env:
           GITHUB_REPO: ${{ github.repository }}
           GITHUB_TOKEN: ${{ github.token }}
