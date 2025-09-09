@@ -80,14 +80,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "name=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^}" | tee -a "${GITHUB_OUTPUT}"
-          echo "tag_prev=$(gh release view --json tagName -q .tagName)" || echo "tag_prev=" | tee -a "${GITHUB_OUTPUT}"
+          echo "tag_prev=$(gh release view --json tagName -q .tagName || git rev-list --reflog --max-parents=0)" | tee -a "${GITHUB_OUTPUT}"
           echo "tag_name=${DEBIAN_RELEASE}/${OS_VERSION}" | tee -a "${GITHUB_OUTPUT}"
       - name: Generate changelog
         id: git-cliff
         uses: orhun/git-cliff-action@v4
         with:
           config: .github/cliff.toml
-          args: --tag "${{ steps.vars.outputs.tag_name }}" -- "${{ steps.vars.outputs.tag_prev }}..HEAD"
+          args: >
+            --strip=header
+            --tag="${{ steps.vars.outputs.tag_name }}"
+            "${{ steps.vars.outputs.tag_prev }}.."
         env:
           GITHUB_REPO: ${{ github.repository }}
           GITHUB_TOKEN: ${{ github.token }}
