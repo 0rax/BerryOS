@@ -4,10 +4,6 @@ on:
   schedule:
     - cron: '0 2 * * *'
 
-concurrency:
-  group: "bookworm-nightly"
-  cancel-in-progress: true
-
 jobs:
   release:
     uses: ./.github/workflows/release.yaml
@@ -16,18 +12,3 @@ jobs:
       os_version: nightly
       publish: true
       prerelease: true
-  build:
-    strategy:
-      matrix:
-        build_arch: ["armhf", "arm64"]
-        include:
-          - build_arch: armhf
-            job_id: build_armhf
-          - build_arch: arm64
-            job_id: build_arm64
-    name: ${{ matrix.job_id }}
-    uses: ./.github/workflows/builder.yaml
-    with:
-      debian_release: bookworm
-      os_version: nightly
-      build_arch: ${{ matrix.build_arch }}
