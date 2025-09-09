@@ -21,8 +21,8 @@ jobs:
               ref: "main",
               inputs: {
                 os_version: "nightly",
-                debian_release: "bookworm"
-                publish: true
-                prelease: true
+                debian_release: "bookworm",
+                publish: true,
+                prerelease: true
               }
             });
