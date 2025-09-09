@@ -3,34 +3,32 @@ name: BerryOS Builder
 on:
   workflow_call:
     inputs:
-      build_arch:
-        type: string
-        description: "Target architecture"
-        required: true
-        default: armhf
-      os_version:
-        type: string
-        description: "OS Version"
-        default: "nightly"
       debian_release:
         type: string
         description: "Base Debian release"
         required: true
         default: bookworm
-  workflow_dispatch:
-    inputs:
-      build_arch:
-        type: choice
-        description: "Target architecture"
-        required: true
-        default: armhf
-        options:
-          - armhf
-          - arm64
       os_version:
         type: string
         description: "OS Version"
         default: "nightly"
+      build_arch:
+        type: string
+        description: "Target architecture"
+        required: true
+        default: armhf
+    outputs:
+      image:
+        description: "Image filename"
+        value: ${{ jobs.image.outputs.filename }}
+      checksum:
+        description: "Image checksum"
+        value: ${{ jobs.image.outputs.checksum }}
+      artifact_id:
+        description: "Artifact name"
+        value: ${{ jobs.image.outputs.artifact_id }}
+  workflow_dispatch:
+    inputs:
       debian_release:
         type: choice
         description: "Base Debian release"
@@ -39,6 +37,18 @@ on:
         options:
           - bullseye
           - bookworm
+      os_version:
+        type: string
+        description: "OS Version"
+        default: "nightly"
+      build_arch:
+        type: choice
+        description: "Target architecture"
+        required: true
+        default: armhf
+        options:
+          - armhf
+          - arm64
 
 defaults:
   run:
@@ -85,6 +95,10 @@ jobs:
         password: ${{ secrets.github_token }}
       volumes:
         - berryos-output:/tmp/berryos-output
+    outputs:
+      filename: ${{ steps.checksum.outputs.image }}
+      checksum: ${{ steps.checksum.outputs.checksum }}
+      artifact_id: ${{ steps.artifact.outputs.artifact-id }}
     env:
       BUILD_DIR: ${{ github.workspace }}
       OUTPUT_DIR: ${{ github.workspace }}/out
@@ -103,13 +117,17 @@ jobs:
         run: |
           ./scripts/10-export.sh
       - name: Generate checksum
+        id: checksum
         run: |
-          sha256sum "out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-${OS_VERSION//.}.img.xz" \
-            > "out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-${OS_VERSION//.}.img.xz.sha256"
+          IMAGE="berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-${OS_VERSION//.}.img.xz"
+          sha256sum "out/${IMAGE}" > "out/${IMAGE}.sha256"
+          echo "image=${IMAGE}" | tee -a "${GITHUB_OUTPUT}"
+          echo "checksum=$(cat out/${IMAGE}.sha256)" | tee -a "${GITHUB_OUTPUT}"
       - name: Upload image
+        id: artifact
         uses: actions/upload-artifact@v4
         with:
           name: berryos-${{ inputs.build_arch }}-image
           path: |
-            out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-*.img.xz
-            out/berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-*.img.xz.sha256
+            out/${{ steps.checksum.outputs.image }}
+            out/${{ steps.checksum.outputs.image }}.sha256

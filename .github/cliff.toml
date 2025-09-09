@@ -6,6 +6,10 @@ owner = "0rax"
 repo = "BerryOS"
 
 [changelog]
+header = """
+## Changelog
+
+"""
 body = """
 {% for commit in commits %}
   {%- if commit.remote.pr_title -%}

@@ -5,104 +5,24 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
-concurrency:
-  group: "bookworm-nightly"
-  cancel-in-progress: true
-
 jobs:
-  build:
-    strategy:
-      matrix:
-        build_arch: ["armhf", "arm64"]
-    uses: ./.github/workflows/builder.yaml
-    with:
-      os_version: nightly
-      debian_release: bookworm
-      build_arch: ${{ matrix.build_arch }}
-  release:
-    needs: build
+  dispatch:
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: out/
-          pattern: |
-            berryos-*-image
-          merge-multiple: true
-      - name: Generate environment
-        env:
-          OS_VERSION: "nightly"
-          DEBIAN_RELEASE: "bookworm"
-        run: |
-          echo "RELEASE_NAME=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^} ($(date --utc "+%Y-%m-%d"))" | tee -a "${GITHUB_ENV}"
-          echo "RELEASE_PREV=$(gh release view --json tagName -q .tagName)" | tee -a "${GITHUB_ENV}"
-          echo "RELEASE_TAG=${DEBIAN_RELEASE}/${OS_VERSION}" | tee -a "${GITHUB_ENV}"
-          echo "ARTIFACT_SUFFIX=${DEBIAN_RELEASE,,}-${OS_VERSION//.}" | tee -a "${GITHUB_ENV}"
-      - name: Generate changelog
-        uses: orhun/git-cliff-action@v4
-        id: git-cliff
-        with:
-          config: .github/cliff.toml
-          args: --tag "${RELEASE_TAG}" -- "${RELEASE_PREV}..HEAD"
-        env:
-          GITHUB_REPO: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ github.token }}
-      - name: Update nightly release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          name: ${{ env.RELEASE_NAME }}
-          draft: false
-          prerelease: true
-          target_commitish: ${{ github.sha }}
-          body: |
-            ## Nightly Builds
-
-            This is an automated nightly release. It includes daily built version of the BerryOS images.
-
-            ### Why use a nightly build?
-
-            Nightly builds allow you to make sure you are using an image that includes the latest version of all install packages. Making the initial setup of BerryOS faster.
-
-            It shouldn't be much different than using a stable release, but it might be a bit more unstable, especially during major updates (when BerryOS needs to be synced with the latest changes from Raspberry Pi OS).
-
-            ### Disclaimer
-
-            These builds are provided without any warranty. No manual testing or benchmarks have been performed.
-
-            If you prefer a stable release, please download the [latest stable release](https://github.com/${{ github.repository }}/releases/latest).
-
-            ## Changes since last stable release
-
-            ${{ steps.git-cliff.outputs.content }}
-
-            ## Compatibility
-
-            - `BerryOS/armhf`
-              - Image: [`berryos-armhf-${{ env.ARTIFACT_SUFFIX }}.img.xz`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/berryos-armhf-${{ env.ARTIFACT_SUFFIX }}.img.xz)
-              - Compatibility: all Raspberry Pi models
-
-            - `BerryOS/arm64`
-              - Image [`berryos-arm64-${{ env.ARTIFACT_SUFFIX }}.img.xz`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/berryos-arm64-${{ env.ARTIFACT_SUFFIX }}.img.xz)
-              - Compatibility:
-                - Raspberry Pi 3B, 3B+, 4 B & 400
-                - Compute Module 3, 3+ & 4
-                - Raspberry Pi Zero 2 W
-                - Raspberry Pi 5
-
-            ## Issues
-
-            If you find any issues when using a nightly build, please report them to the [issue tracker](https://github.com/${{ github.repository }}/issues). Make sure to include the content of `/etc/rpi-issue` in your report so we can pin-point the specific build you are using.
-          files: out/*
-          fail_on_unmatched_files: true
-      - name: Update nightly tag
+      - name: Dispatch release workflow
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.rest.git.updateRef({
+            await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'tags/${{ env.RELEASE_TAG }}',
-              sha: context.sha
+              workflow_id: "release.yaml",
+              ref: "main",
+              inputs: {
+                os_version: "nightly",
+                debian_release: "bookworm"
+                publish: true
+                prelease: true
+              }
             });
