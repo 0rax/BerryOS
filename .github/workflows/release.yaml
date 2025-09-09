@@ -1,25 +1,7 @@
-name: Release Build
+name: BerryOS Releases
+run-name: BerryOS Release (${{ inputs.debian_release }}/${{ inputs.os_version }})
 
 on:
-  workflow_call:
-    inputs:
-      debian_release:
-        type: string
-        required: true
-        description: "Base Debian release"
-        default: bookworm
-      os_version:
-        type: string
-        description: "OS Version"
-        default: "nightly"
-      publish:
-        type: boolean
-        description: Publish release
-        default: false
-      prerelease:
-        type: boolean
-        description: Mark release as pre-release
-        default: true
   workflow_dispatch:
     inputs:
       debian_release:
@@ -108,7 +90,7 @@ jobs:
           merge-multiple: true
       - name: Create release
         uses: softprops/action-gh-release@v2
-        if: ${{ (inputs.os_version || github.event.inputs.os_version) != 'nightly' }}
+        if: ${{ inputs.os_version != 'nightly' }}
         with:
           tag_name: ${{ needs.changelog.outputs.tag_name }}
           name: ${{ needs.changelog.outputs.name }}
@@ -141,7 +123,7 @@ jobs:
           fail_on_unmatched_files: true
       - name: Upsert nightly release
         uses: softprops/action-gh-release@v2
-        if: ${{ (inputs.os_version || github.event.inputs.os_version) == 'nightly' }}
+        if: ${{ inputs.os_version == 'nightly' }}
         with:
           tag_name: ${{ needs.changelog.outputs.tag_name }}
           name: ${{ needs.changelog.outputs.name }}
@@ -190,7 +172,7 @@ jobs:
           fail_on_unmatched_files: true
       - name: Update nightly tag
         uses: actions/github-script@v7
-        if: ${{ (inputs.os_version || github.event.inputs.os_version) == 'nightly' }}
+        if: ${{ inputs.os_version == 'nightly' }}
         with:
           script: |
             github.rest.git.updateRef({

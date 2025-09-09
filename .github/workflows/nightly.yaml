@@ -1,9 +1,9 @@
-name: Nightly Build
+name: Nightly Builds
+run-name: Dispatch Nightly Release
 
 on:
   schedule:
     - cron: '0 2 * * *'
-  workflow_dispatch:
 
 jobs:
   dispatch:

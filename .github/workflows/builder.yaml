@@ -1,4 +1,5 @@
 name: BerryOS Builder
+run-name: BerryOS/${{ inputs.build_arch }} (${{ inputs.debian_release }}/${{ inputs.os_version }})
 
 on:
   workflow_call:
