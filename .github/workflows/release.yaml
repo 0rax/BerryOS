@@ -48,34 +48,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        build_arch: ["armhf", "arm64"]
-        include:
-          - build_arch: armhf
-            job_id: build_armhf
-          - build_arch: arm64
-            job_id: build_arm64
-    name: ${{ matrix.job_id }}
+  build_armhf:
     uses: ./.github/workflows/builder.yaml
     with:
       debian_release: ${{ inputs.debian_release }}
       os_version: ${{ inputs.os_version }}
-      build_arch: ${{ matrix.build_arch }}
+      build_arch: armhf
+  build_arm64:
+    uses: ./.github/workflows/builder.yaml
+    with:
+      debian_release: ${{ inputs.debian_release }}
+      os_version: ${{ inputs.os_version }}
+      build_arch: arm64
   changelog:
     runs-on: ubuntu-latest
     outputs:
-      name: ${{ steps.env.outputs.name }}
-      tag_name: ${{ steps.env.outputs.tag_name }}
+      name: ${{ steps.vars.outputs.name }}
+      tag_name: ${{ steps.vars.outputs.tag_name }}
       content: ${{ steps.git-cliff.outputs.content }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Generate environment
-        id: env
+      - name: Generate variables
+        id: vars
         shell: bash
         env:
           OS_VERSION: ${{ inputs.os_version }}
@@ -83,11 +80,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "name=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^}" | tee -a "${GITHUB_OUTPUT}"
-          echo "tag_prev=$(gh release view --json tagName -q .tagName)" | tee -a "${GITHUB_OUTPUT}"
+          echo "tag_prev=$(gh release view --json tagName -q .tagName)" || echo "tag_prev=" | tee -a "${GITHUB_OUTPUT}"
           echo "tag_name=${DEBIAN_RELEASE}/${OS_VERSION}" | tee -a "${GITHUB_OUTPUT}"
       - name: Generate changelog
-        uses: orhun/git-cliff-action@v4
         id: git-cliff
+        uses: orhun/git-cliff-action@v4
         with:
           config: .github/cliff.toml
           args: --tag "${{ steps.env.outputs.tag_name }}" -- "${{ steps.env.outputs.tag_prev }}..HEAD"
@@ -95,15 +92,16 @@ jobs:
           GITHUB_REPO: ${{ github.repository }}
           GITHUB_TOKEN: ${{ github.token }}
   release:
-    needs: [changelog, build]
+    needs: [changelog, build_armhf, build_arm64]
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           path: out/
-          pattern: |
-            berryos-*-image
+          artifact-ids: >
+            ${{ needs.build_armhf.outputs.artifact_id }},
+            ${{ needs.build_arm64.outputs.artifact_id }}
           merge-multiple: true
       - name: Create release
         uses: softprops/action-gh-release@v2
@@ -122,11 +120,11 @@ jobs:
             ## Compatibility
 
             - `BerryOS/armhf`
-              - Image: [`${{ needs.build_armhf.outputs.image }}`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/${{ needs.build_armhf.outputs.image }})
+              - Image: [`${{ needs.build_armhf.outputs.image }}`](https://github.com/${{ github.repository }}/releases/download/${{ needs.changelog.outputs.tag_name }}/${{ needs.build_armhf.outputs.image }})
               - Compatibility: all Raspberry Pi models
 
             - `BerryOS/arm64`
-              - Image [`${{ needs.build_arm64.outputs.image }}`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/${{ needs.build_arm64.outputs.image }})
+              - Image: [`${{ needs.build_arm64.outputs.image }}`](https://github.com/${{ github.repository }}/releases/download/${{ needs.changelog.outputs.tag_name }}/${{ needs.build_arm64.outputs.image }})
               - Compatibility:
                 - Raspberry Pi 3B, 3B+, 4 B & 400
                 - Compute Module 3, 3+ & 4
@@ -171,11 +169,11 @@ jobs:
             ## Compatibility
 
             - `BerryOS/armhf`
-              - Image: [`${{ needs.build_armhf.outputs.image }}`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/${{ needs.build_armhf.outputs.image }})
+              - Image: [`${{ needs.build_armhf.outputs.image }}`](https://github.com/${{ github.repository }}/releases/download/${{ needs.changelog.outputs.tag_name }}/${{ needs.build_armhf.outputs.image }})
               - Compatibility: all Raspberry Pi models
 
             - `BerryOS/arm64`
-              - Image [`${{ needs.build_arm64.outputs.image }}`](https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/${{ needs.build_arm64.outputs.image }})
+              - Image: [`${{ needs.build_arm64.outputs.image }}`](https://github.com/${{ github.repository }}/releases/download/${{ needs.changelog.outputs.tag_name }}/${{ needs.build_arm64.outputs.image }})
               - Compatibility:
                 - Raspberry Pi 3B, 3B+, 4 B & 400
                 - Compute Module 3, 3+ & 4

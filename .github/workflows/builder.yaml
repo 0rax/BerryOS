@@ -21,6 +21,12 @@ on:
       image:
         description: "Image filename"
         value: ${{ jobs.image.outputs.filename }}
+      checksum:
+        description: "Image checksum"
+        value: ${{ jobs.image.outputs.checksum }}
+      artifact_id:
+        description: "Artifact name"
+        value: ${{ jobs.image.outputs.artifact_id }}
   workflow_dispatch:
     inputs:
       debian_release:
@@ -91,6 +97,8 @@ jobs:
         - berryos-output:/tmp/berryos-output
     outputs:
       filename: ${{ steps.checksum.outputs.image }}
+      checksum: ${{ steps.checksum.outputs.checksum }}
+      artifact_id: ${{ steps.artifact.outputs.artifact-id }}
     env:
       BUILD_DIR: ${{ github.workspace }}
       OUTPUT_DIR: ${{ github.workspace }}/out
@@ -113,8 +121,10 @@ jobs:
         run: |
           IMAGE="berryos-${{ inputs.build_arch }}-${{ inputs.debian_release }}-${OS_VERSION//.}.img.xz"
           sha256sum "out/${IMAGE}" > "out/${IMAGE}.sha256"
-          echo "image=${IMAGE}" | tee -a ${GITHUB_OUTPUT}
+          echo "image=${IMAGE}" | tee -a "${GITHUB_OUTPUT}"
+          echo "checksum=$(cat out/${IMAGE}.sha256)" | tee -a "${GITHUB_OUTPUT}"
       - name: Upload image
+        id: artifact
         uses: actions/upload-artifact@v4
         with:
           name: berryos-${{ inputs.build_arch }}-image
