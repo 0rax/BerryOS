@@ -47,6 +47,7 @@ jobs:
     outputs:
       name: ${{ steps.vars.outputs.name }}
       tag_name: ${{ steps.vars.outputs.tag_name }}
+      build_date: ${{ steps.vars.outputs.build_date }}
       content: ${{ steps.git-cliff.outputs.content }}
     steps:
       - name: Checkout
@@ -64,6 +65,7 @@ jobs:
           echo "name=BerryOS ${DEBIAN_RELEASE^} ${OS_VERSION^}" | tee -a "${GITHUB_OUTPUT}"
           echo "tag_prev=$(gh release view --json tagName -q .tagName || git rev-list --reflog --max-parents=0)" | tee -a "${GITHUB_OUTPUT}"
           echo "tag_name=${DEBIAN_RELEASE}/${OS_VERSION}" | tee -a "${GITHUB_OUTPUT}"
+          echo "build_date=$(date -u +'%Y-%m-%d')" | tee -a "${GITHUB_OUTPUT}"
       - name: Generate changelog
         id: git-cliff
         uses: orhun/git-cliff-action@v4
@@ -118,7 +120,7 @@ jobs:
 
             ## Issues
 
-            If you find any release when using this build, please report them to the [issue tracker](https://github.com/${{ github.repository }}/issues). Make sure to include the the content of `/etc/rpi-issue` (also available in `/boot/firmware/issue.txt`) in your report so we can pin-point the specific build you are using.
+            If you find any issues when using this build, please report them to the [issue tracker](https://github.com/${{ github.repository }}/issues). Make sure to include the content of `/etc/rpi-issue` (also available in `/boot/firmware/issue.txt`) in your report so we can pin-point the specific build you are using.
           files: out/*
           fail_on_unmatched_files: true
       - name: Upsert nightly release
@@ -126,14 +128,14 @@ jobs:
         if: ${{ inputs.os_version == 'nightly' }}
         with:
           tag_name: ${{ needs.changelog.outputs.tag_name }}
-          name: ${{ needs.changelog.outputs.name }}
+          name: ${{ needs.changelog.outputs.name }} (${{ needs.changelog.outputs.build_date }})
           draft: ${{ !inputs.publish }}
           prerelease: ${{ inputs.prerelease }}
           target_commitish: ${{ github.sha }}
           body: |
-            ## Nightly Builds
+            ## Nightly Build
 
-            This is an automated nightly release. It includes daily built version of the BerryOS images.
+            This is an automated nightly release. It includes daily built versions of the BerryOS images.
 
             ### Why use a nightly build?
 
@@ -145,7 +147,7 @@ jobs:
 
             These builds are provided without any warranty. No manual testing or benchmarks have been performed.
 
-            If you prefer a stable release, please download the [latest stable release](https://github.com/${{ github.repository }}/releases/latest).
+            If you prefer a stable version, please download the [latest stable release](https://github.com/${{ github.repository }}/releases/latest).
 
             ## Changes since last stable release
 
@@ -167,7 +169,7 @@ jobs:
 
             ## Issues
 
-            If you find any issues when using a nightly build, please report them to the [issue tracker](https://github.com/${{ github.repository }}/issues). Make sure to include the the content of `/etc/rpi-issue` (also available in `/boot/firmware/issue.txt`) in your report so we can pin-point the specific build you are using.
+            If you find any issues when using a nightly build, please report them to the [issue tracker](https://github.com/${{ github.repository }}/issues). Make sure to include the content of `/etc/rpi-issue` (also available in `/boot/firmware/issue.txt`) in your report so we can pin-point the specific build you are using.
           files: out/*
           fail_on_unmatched_files: true
       - name: Update nightly tag
@@ -178,6 +180,6 @@ jobs:
             github.rest.git.updateRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'tags/${{ needs.changelog.outputs.tag_name }}',
+              ref: `tags/${{ needs.changelog.outputs.tag_name }}`,
               sha: context.sha
             });
