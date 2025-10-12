@@ -114,6 +114,22 @@ Download and image sizes have been calculated using `ls -l --block-size=M`.
 | Download size          | 288M                          | 432M                               |
 | Image size             | 1296M                         | 2704M                              |
 
+## Development
+
+The BerryOS toolchain (a set of provisioning scripts) is build to run inside a Docker container and is controlled using Docker Compose. In order to build BerryOS locally you will need to have the following software installed:
+
+- [Docker](https://docs.docker.com/engine/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [GNU Make](https://www.gnu.org/software/make/)
+
+Before proceeding with using the toolchain, you will need enable `binfmt_misc` support in your Docker host kernel. To do so you can run the following command:
+
+```sh
+docker run --rm --privileged multiarch/qemu-user-static:register
+```
+
+This will allow the boostrapping scripts to run non-native binary format (such as `arm7` or `aarch64` binaries) on your system.
+
 ## Acknowledgements
 
 This project has been heavily inspired by the work previously done by the team at [Hypriot](https://github.com/hypriot) for their HypriotOS. It was the starting point of this project and this project wouldn't exist without it.

@@ -38,6 +38,7 @@ on:
         options:
           - bullseye
           - bookworm
+          - trixie
       os_version:
         type: string
         description: "OS Version"
